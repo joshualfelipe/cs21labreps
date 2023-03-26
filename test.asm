@@ -24,21 +24,9 @@ main:
 	
 	addi	counter, $0, 2		# counter = 2
 	
-	beq	n, $0, base0		# checks if n = 0, if true branch to a base case
-	addi	$t1, $t1, 1		
-	beq	n, $t1, base1		# checks if n = 1, another base case
-	jal	fib			# recursive call start
-	j	print			# print
-
-base0:
-	move	sum, x			# move value of x to sum
-	j	print
+	jal	fib
 	
-base1:
-	move	sum, y			# move value of y to sum
-	j	print
-print:
-	move	$a0, sum		# store final value of fib to a0 for printing
+	move	x, sum			# store final value of fib to a0 for printing
 	li	$v0, 1
 	syscall				# print out final value of fib()
 	
@@ -47,8 +35,9 @@ print:
 
 fib:
 	###### PREAMBLE ######	
-	subu	$sp, $sp, 4		# Allocate memory for storing ra
-	sw	$ra, 0($sp)		# store ra in memory
+	subu	$sp, $sp, 4
+	sw	$ra, 0($sp)
+	
 	
 	beq	counter, n, base	# Check if base case: n = counter
 	
@@ -60,20 +49,21 @@ fib:
 	add	y, x, y			# Else, store result on y register
 	j	recurse			# Proceed on recursive call
 even:
-	add	x, x, y			# Store result on x register
-	j	recurse			# jump to recursion call
+	add	x, x, y
+	j	recurse
 	
 recurse:
 	addi	counter, counter, 1	# increment counter
 	jal	fib			# recursive step
-	j	end			# skip base case since recursive call is done
+	j	end
 	
 base:					# base case
 	add	sum, x, y		# store result to sum, and return it as final value
+	j	end
 
 end:
-	lw	$ra, 0($sp)		# load memory address to ra
-	addu	$sp, $sp, 4		# move up sp
+	lw	$ra, 0($sp)
+	addu	$sp, $sp, 4
 	jr	$ra			# go back to main
 	
-# Found limitation is n = 50 because there is overflow when adding x and y
+	
