@@ -33,9 +33,33 @@ main:
 	l.s	$f0, f_b
 	mfc1	y, $f0			# copy float to a register
 	
-	jal	func			# Function call
+	beq	x, y, possible0
+	beqz	x, y_answer
+	beq	x, 0x80000000, y_answer
+	beqz	y, x_answer
+	beq	y, 0x80000000, x_answer
+	j	noZeros
 	
-	sw	final, f_c		# Storing result into memory
+possible0:
+	beqz	x, EqualZero 
+
+noZeros:
+	jal	func			# Function call
+	j	end
+
+y_answer:
+	add	final, $0, y
+	j 	end
+	
+x_answer:
+	add	final, $0, x
+	j	end
+	
+EqualZero:
+	li	final, 0
+	
+end:
+	sw	final, f_c		# Storing result into memory	
 	li	$v0, 10			# End Program
 	syscall
 
