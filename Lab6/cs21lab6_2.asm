@@ -42,6 +42,7 @@ main:
 	
 possible0:
 	beqz	x, EqualZero 
+	beq	x, 0x80000000, EqualZero
 
 noZeros:
 	jal	func			# Function call
@@ -95,7 +96,9 @@ func:
 	
  yIsLess:	
  	exponent(x_e, y_e, y_m)
- 	add	result_e, $0, y_e
+ 	add	result_e, $0, x_e
+ 	
+
 	
 #############################################################################################################
 
