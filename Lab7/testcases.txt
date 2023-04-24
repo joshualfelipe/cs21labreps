@@ -1,0 +1,87 @@
+Node *a = new_node(5);
+Node *b = new_node(10);
+Node *c = new_node(17);
+Node *d = new_node(1);
+Node *e = new_node(0);
+Node *f = new_node(10);
+Node *g = new_node(12);
+Node *h = new_node(1);
+Node *i = new_node(2);
+Node *j = new_node(15);
+link(a, b, c);
+link(b, d, e);
+link(c, f, g);
+link(d, NULL, NULL);
+link(e, NULL, NULL);
+link(f, h, i);
+link(g, j, NULL);
+link(h, NULL, NULL);
+link(i, NULL, NULL);
+link(j, NULL, NULL);
+
+OUTPUT: 3, 12
+
+
+Node *a = new_node(35);
+Node *b = new_node(10);
+Node *c = new_node(117);
+Node *d = new_node(200);
+Node *e = new_node(0);
+Node *f = new_node(10);
+Node *g = new_node(12);
+Node *h = new_node(1);
+Node *i = new_node(2);
+Node *j = new_node(15);
+link(a, b, c);
+link(b, d, e);
+link(c, f, g);
+link(d, NULL, NULL);
+link(e, NULL, NULL);
+link(f, h, i);
+link(g, j, NULL);
+link(h, NULL, NULL);
+link(i, NULL, NULL);
+link(j, NULL, NULL);
+
+OUTPUT: 3, 200
+
+
+Node *a = new_node(4);
+Node *b = new_node(6);
+Node *c = new_node(7);
+Node *d = new_node(8);
+Node *e = new_node(35);
+Node *f = new_node(9);
+Node *g = new_node(10);
+Node *h = new_node(36);
+Node *i = new_node(0);
+Node *j = new_node(3);
+link(a, b, NULL);
+link(b, c, d);
+link(c, e, NULL);
+link(d, f, g);
+link(e, h, NULL);
+link(f, i, NULL);
+link(i, j, NULL);
+link(j, NULL, NULL);
+
+OUTPUT: 5, 36
+
+
+Node *a = new_node(3);
+Node *b = new_node(4);
+Node *c = new_node(5);
+Node *d = new_node(1);
+Node *e = new_node(8);
+Node *f = new_node(2);
+Node *g = new_node(7);
+Node *h = new_node(6);
+link(a, b, c);
+link(b, d, e);
+link(c, f, NULL);
+link(d, NULL, g);
+link(f, NULL, h);
+link(g, NULL, NULL);
+link(h, NULL, NULL);
+
+OUTPUT: 3, 8
