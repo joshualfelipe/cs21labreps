@@ -82,25 +82,28 @@ end:
 	li	$t1, 0
 	li	$t2, 4
 	la	$t4, input_buffer
+	move	$t5, $t4
 	la	$t3, pieceAscii
 
 outer_loop:
 	beq	$t1, %len, end_outer_loop
-	sw	$t4, 0($t3)		# pieceAscii.append(row)
+	
 inner_loop:
 	li 	$v0, 8              	# syscall code 8 for read string
-    	move 	$a0, $t4          	# buffer address
+    	move 	$a0, $t5          	# buffer address
     	li 	$a1, 6           	# maximum number of characters to read
    	syscall                		# call the syscall to read input
 	
-	addi	$t4, $t4, 4
+	addi	$t5, $t5, 4
 	addi	$t2, $t2, -1
 	bne	$t2, $zero, inner_loop
 	
+	sw	$t4, 0($t3)		# pieceAscii.append(row)
+	move	$t4, $t5
 	convert_pieces_to_pairs($t3, $t1)# piecePairs = convert_piece_to_pairs(pieceAscii)
 	addi	$t1, $t1, 1
-	addi	%arr, %arr, 4
 	sw	$v0, 0(%arr) 		# converted_pieces.append(piecePairs)
+	addi	%arr, %arr, 4
 	addi	$t3, $t3, 4
 	li	$t2, 4
 	j	outer_loop
@@ -162,30 +165,17 @@ end_loop:
 	sw	$t6, 4($sp)
 	
 	li	$t0, 0
-	#li	$t1, 0
 	li	$t2, 10
-	#li	$t3, 6
 	li	$v0, 0x1
 loop1:
 	beq	$t0, $t2, end_loop
-#loop2:
-	#beq	$t1, $t3, end_loop2
-	#lb	$t4, 0(%start)
-	#lb	$t5, 0(%final)
 	lw	$t4, 0(%start)
 	lw	$t5, 0(%final)
 	bne	$t4, $t5, false
-	#addi	%start, %start, 1
-	#addi	%final, %final, 1
 	addi	%start, %start, 4
 	addi	%final, %final, 4
-	#addi	$t1, $t1, 1
-	#j	loop2
 end_loop2:
-	#li	$t1, 0
 	addi	$t0, $t0, 1
-	#addi	%start, %start, 2	# To change if aayusin yung inputs
-	#addi	%final, %final, 2	# To change if aayusin yung inputs
 	addi	%start, %start, 4	# To change if aayusin yung inputs
 	addi	%final, %final, 4	# To change if aayusin yung inputs
 	j	loop1
@@ -257,6 +247,42 @@ end_i:
 	addi	$sp, $sp, 32	
 .end_macro 
 
+.macro get_max_x_of_piece(%piece, %pos)
+	subi	$sp, $sp, 32
+	sw	$t0, 24($sp)
+	sw	$t1, 20($sp)
+	sw	$t2, 16($sp)
+	sw	$t3, 12($sp)
+	sw	$t4, 8($sp)
+	
+	li	$t0, %pos
+	sll	$t0, $t0, 3
+	addi	$t1, $t0, 4
+	move	$t3, %piece
+	lw	$t3, 0($t3)
+	add	$t3, $t3, $t0
+	li	$t2, -1
+	
+loop:
+	bge	$t0, $t1, end
+	lb	$t4, 2($t3)
+	addi	$t3, $t3, 4
+	addi	$t0, $t0, 1
+	blt	$t2, $t4, block_is_greater
+	j	loop
+block_is_greater:
+	move	$t2, $t4
+	j	loop
+end:
+	move	$v0, $t2
+	sw	$t0, 24($sp)
+	sw	$t1, 20($sp)
+	sw	$t2, 16($sp)
+	sw	$t3, 12($sp)
+	sw	$t4, 8($sp)	
+	addi	$sp, $sp, 32
+.end_macro 
+
 ###### DO NOT MODIFY THESE REGISTERS ######
 # S0 base address of start grid
 # S1 base address of final grid
@@ -271,29 +297,35 @@ end_i:
 	move	$s2, $s0		# S2 copy of base address of S0
 	move	$s3, $s1		# S3 copy of base address of S1
 	
-	init_arr($s2)
-	init_arr($s3)
-	get_input($s2)
-	get_input($s3)
+	#init_arr($s2)
+	#init_arr($s3)
+	#get_input($s2)
+	#get_input($s3)
 
 	#li	$v0, 5			# Get integer from user
 	#syscall
 	#move	$s2, $v0
-	#li	$s2, 2
+	li	$s2, 2
 	
 	#la	$s3, chosen
 	#move	$t0, $s3		# make copy of address of s3
 	#init_chosen($s2, $t0)
 
-	#la	$s4, converted_pieces
-	#move	$t0, $s4		# make copy of address of s4
+	la	$s4, converted_pieces
+	move	$t0, $s4		# make copy of address of s4
 
-	#get_pieces($s2, $t0)
+	get_pieces($s2, $t0)
+	get_max_x_of_piece($s4, 0)
 	#move	$s4, $t0
 	#freeze_blocks($t7)
-	is_equal_grids($s0, $s1)
-	#move	$s5, $v0
-
+	#is_equal_grids($s0, $s1)
+	move	$s5, $v0
+	
+	
+	
+	li	$v0, 1
+	move	$a0, $s5
+	syscall
 	
     	li $v0, 10             # exit program
     	syscall
