@@ -6,6 +6,13 @@
 # p + r * cols + c
 
 .macro init_arr(%p)
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	sw	$t3, 16($sp)
+	sw	$t4, 12($sp)	
+	
 	li	$t0, 0			# r
 	li	$t1, 0			# c
 	li	$t2, 6			# cols
@@ -26,9 +33,26 @@ end_inner_init_loop:
 	j	init_loop
 
 end_init_loop:
+
+	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	lw	$t3, 16($sp)
+	lw	$t4, 12($sp)
+	addi	$sp, $sp, 32
 .end_macro
 
 .macro get_input(%p)
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	sw	$t3, 16($sp)
+	sw	$t4, 12($sp)
+	sw	$t5, 8($sp)
+	sw	$t6, 4($sp)
+	sw	$t7, 0($sp)
+	
 	la 	$t0, input_buffer   	# load address of input buffer
     	li 	$t1, 6              	# loop counter for lines
 
@@ -37,7 +61,7 @@ read_lines:
     	move 	$a0, $t0          	# buffer address
     	li 	$a1, 8	         	# maximum number of characters to read
    	syscall                		# call the syscall to read input
-	move	$t2, $t0		# copy base address of input to t2
+	move	$t2, $t0			# copy base address of input to t2
 	
 	li	$t5, 0			# counter = 0
 	li	$s4, 6			# numCols = 6
@@ -61,12 +85,29 @@ end_loop:
     	sw 	$t4, 4(%p)		# store string at memory location
 
     	addi	$t0, $t0, 8       	# increment buffer pointer by 8 bytes
-    	addi 	%p, %p, 8       	# increment memory pointer by 4 bytes
+    	addi 	%p, %p, 8       		# increment memory pointer by 4 bytes
     	addi 	$t1, $t1, -1      	# decrement line counter
-    	bnez	$t1, read_lines 	# loop until 6 lines have been read
+    	bnez	$t1, read_lines 		# loop until 6 lines have been read
+    	
+    	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	lw	$t3, 16($sp)
+	lw	$t4, 12($sp)
+	lw	$t5, 8($sp)
+	lw	$t6, 4($sp)
+	lw	$t7, 0($sp)
+	addi	$sp, $sp, 32
 .end_macro
 
 .macro init_chosen(%len, %arr)
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	
+	# tracks which piece has been used
+	# chosen = [False for _ in range(numPieces)] 
 	li	$t1, 0
 	li	$t2, 0
 loop:
@@ -76,19 +117,35 @@ loop:
 	addi	$t1, $t1, 1
 	j	loop
 end:
+	# returns arr
+	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	addi	$sp, $sp, 32
 .end_macro 
 
 .macro get_pieces(%len, %arr)
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	sw	$t3, 16($sp)
+	sw	$t4, 12($sp)
+	sw	$t5, 8($sp)
+
+	# This code asks for user to input the pieces and returns
+	# an array containing the piecePairs
 	li	$t1, 0
 	li	$t2, 4
 	la	$t4, input_buffer
 	move	$t5, $t4
-	la	$t3, pieceAscii
+	la	$t3, pieceAscii	# pieceAscii = []
 
 outer_loop:
 	beq	$t1, %len, end_outer_loop
 	
 inner_loop:
+	# row = [character for character in line]
 	li 	$v0, 8              	# syscall code 8 for read string
     	move 	$a0, $t5          	# buffer address
     	li 	$a1, 6           	# maximum number of characters to read
@@ -103,12 +160,19 @@ inner_loop:
 	convert_pieces_to_pairs($t3, $t1)# piecePairs = convert_piece_to_pairs(pieceAscii)
 	addi	$t1, $t1, 1
 	sw	$v0, 0(%arr) 		# converted_pieces.append(piecePairs)
-	addi	%arr, %arr, 4
+	addi	%arr, %arr, 4		# move to next piece
 	addi	$t3, $t3, 4
 	li	$t2, 4
 	j	outer_loop
 	
 end_outer_loop:
+	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	lw	$t3, 16($sp)
+	lw	$t4, 12($sp)
+	lw	$t5, 8($sp)
+	addi	$sp, $sp, 32
 .end_macro 
 
 .macro freeze_blocks(%grid)
@@ -127,12 +191,12 @@ end_outer_loop:
 	li	$t3, 6
 	li	$t5, 0x58
 loop1:
-	beq	$t0, $t2, end_loop
+	beq	$t0, $t2, end_loop	# for i in range(6 + 4):
 loop2:
-	beq	$t1, $t3, end_loop2
+	beq	$t1, $t3, end_loop2	# for j in range(6):
 	lb	$t4, 0(%grid)
-	bne	$t4, 0x23, increment
-	sb	$t5, 0(%grid)
+	bne	$t4, 0x23, increment	# if grid[i][j] == '#':
+	sb	$t5, 0(%grid)		# grid[i][j] = 'X'
 	
 increment:
 	addi	$t1, $t1, 1
@@ -145,6 +209,7 @@ end_loop2:
 	j	loop1
 
 end_loop:
+	# return grid
 	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
 	lw	$t2, 20($sp)
@@ -168,10 +233,10 @@ end_loop:
 	li	$t2, 10
 	li	$v0, 0x1
 loop1:
-	beq	$t0, $t2, end_loop
+	beq	$t0, $t2, end_loop	# for i in range(6 + 4):
 	lw	$t4, 0(%start)
 	lw	$t5, 0(%final)
-	bne	$t4, $t5, false
+	bne	$t4, $t5, false		# (gridOne[i][j] == gridTwo[i][j])
 	addi	%start, %start, 4
 	addi	%final, %final, 4
 end_loop2:
@@ -181,6 +246,7 @@ end_loop2:
 	j	loop1
 false:	li	$v0, 0
 end_loop:	
+	# return result
 	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
 	lw	$t2, 20($sp)
@@ -283,6 +349,55 @@ end:
 	addi	$sp, $sp, 32
 .end_macro 
 
+.macro deepcopy(%arr, %len)
+	# Creates a deepcopy of either the chosen array or grid.
+	# TO EDIT: Possible implement on a heap
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	sw	$t3, 16($sp)
+	sw	$t4, 12($sp)
+	
+	li	$t4, %len
+	li	$t0, 0
+	move	$t1, %arr
+	la	$t2, deep_grid
+	beq	$t4, 0xa, grid
+	la	$t2, deep_chosen
+	j	chosen
+grid:
+	beq	$t0, 20, end_grid
+	lw	$t3, 0($t1)
+	sw	$t3, 0($t2)
+	addi	$t1, $t1, 4
+	addi	$t2, $t2, 4
+	addi	$t0, $t0, 1
+	j 	grid
+	
+chosen:
+	beq	$t0, 2, end_chosen
+	lw	$t3, 0($t1)
+	sw	$t3, 0($t2)
+	addi	$t1, $t1, 4
+	addi	$t2, $t2, 4
+	addi	$t0, $t0, 1
+	j 	chosen
+	
+end_grid:
+	la	$v0, deep_grid
+	j	end
+end_chosen:
+	la	$v0, deep_chosen
+end:	
+	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	lw	$t3, 16($sp)
+	lw	$t4, 12($sp)
+	addi	$sp, $sp, 32
+.end_macro 
+
 ###### DO NOT MODIFY THESE REGISTERS ######
 # S0 base address of start grid
 # S1 base address of final grid
@@ -291,12 +406,13 @@ end:
 # S4 base address of pieces
 
 .text
-	# Initiate grids to have 4 empty rows
+	# Initialize grids to have 4 empty rows
 	la	$s0, start_grid   	# $s0 = address of start_grid
 	la	$s1, final_grid   	# $s1 = address of final_grid
 	move	$s2, $s0		# S2 copy of base address of S0
 	move	$s3, $s1		# S3 copy of base address of S1
 	
+	##### GET INPUTS #####
 	#init_arr($s2)
 	#init_arr($s3)
 	#get_input($s2)
@@ -305,27 +421,26 @@ end:
 	#li	$v0, 5			# Get integer from user
 	#syscall
 	#move	$s2, $v0
-	li	$s2, 2
+	#li	$s2, 2
 	
 	#la	$s3, chosen
 	#move	$t0, $s3		# make copy of address of s3
 	#init_chosen($s2, $t0)
 
-	la	$s4, converted_pieces
-	move	$t0, $s4		# make copy of address of s4
-
-	get_pieces($s2, $t0)
-	get_max_x_of_piece($s4, 0)
-	#move	$s4, $t0
+	#la	$s4, converted_pieces
+	#move	$t0, $s4		# make copy of address of s4
+	#get_pieces($s2, $t0)
+	
+	##### WORKING FUCNTION CALLS #####
+	#get_max_x_of_piece($s4, 0)
 	#freeze_blocks($t7)
 	#is_equal_grids($s0, $s1)
-	move	$s5, $v0
-	
-	
-	
-	li	$v0, 1
-	move	$a0, $s5
-	syscall
+	#deepcopy($s3, 1)
+	#move	$s5, $v0
+		
+	#li	$v0, 1
+	#move	$a0, $s5
+	#syscall
 	
     	li $v0, 10             # exit program
     	syscall
@@ -339,7 +454,12 @@ converted_pieces:.space 24	# allocate space for 4x6 converted pieces array
 pieceAscii:	.space 96	# allocate 4x4x6 for pieceAscii
 pieceCoords:	.space 96	# allocate 4x4x6 for pieceCoords
 input_buffer:   .space 8		# space to hold input string
+deep_grid:	.space 96
+deep_chosen:	.space 24
 
+
+yes:		.asciiz "\nYes"
+no:		.asciiz "\nNo"
 #prompt:         .asciiz "Enter a string: "
 #_file:	.asciiz "1.in"
 #input_buffer:	.space 8

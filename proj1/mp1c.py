@@ -22,6 +22,7 @@ def freeze_blocks(grid):
     return grid
 
 
+### DONE ###
 def get_max_x_of_piece(piece):
     max_x = -1
     for block in piece:
