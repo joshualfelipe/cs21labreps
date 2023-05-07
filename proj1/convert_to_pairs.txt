@@ -1,0 +1,46 @@
+convert_piece_to_pairs:
+    # Allocate space on the stack for the pieceCoords array
+    addi $sp, $sp, -16
+    sw $ra, 0($sp)      # Save the return address
+    sw $s0, 4($sp)      # Save the base address of pieceCoords
+    sw $s1, 8($sp)      # Save the loop counter i
+    sw $s2, 12($sp)     # Save the loop counter j
+
+    # Initialize variables
+    la $s0, pieceCoords # Load the base address of pieceCoords
+    li $s1, 0           # Initialize i to 0
+    li $s2, 0           # Initialize j to 0
+
+    # Loop through the pieceGrid array
+convert_piece_to_pairs_loop_i:
+    blt $s1, 4, convert_piece_to_pairs_loop_j_end # If i < 4, jump to the inner loop
+    j convert_piece_to_pairs_done                # Otherwise, we're done
+
+convert_piece_to_pairs_loop_j:
+    lb $t0, 0($a0)      # Load the value of pieceGrid[i][j] into $t0
+    beq $t0, 35, convert_piece_to_pairs_found    # If it's '#' (ASCII code 35), jump to the found label
+    addi $a0, $a0, 1    # Otherwise, increment the address of pieceGrid[i][j]
+    addi $s2, $s2, 1    # Increment j
+    j convert_piece_to_pairs_loop_j            # Repeat the inner loop
+
+convert_piece_to_pairs_loop_j_end:
+    addi $s1, $s1, 1    # Increment i
+    li $s2, 0           # Reset j to 0
+    j convert_piece_to_pairs_loop_i            # Repeat the outer loop
+
+convert_piece_to_pairs_found:
+    # Add the (i, j) coordinates to pieceCoords
+    sw $s1, 0($s0)      # Store i at pieceCoords[k][0]
+    sw $s2, 4($s0)      # Store j at pieceCoords[k][1]
+    addi $s0, $s0, 8    # Increment the address of pieceCoords[k]
+    addi $a0, $a0, 1    # Increment the address of pieceGrid[i][j]
+    j convert_piece_to_pairs_loop_j            # Continue the inner loop
+
+convert_piece_to_pairs_done:
+    # Clean up the stack and return
+    lw $ra, 0($sp)
+    lw $s0, 4($sp)
+    lw $s1, 8($sp)
+    lw $s2, 12($sp)
+    addi $sp, $sp, 16
+    jr $ra

@@ -12,20 +12,6 @@
 .####.
 1
 ....
-....
-....
-####
-
-init: asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-goal: asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-      asciiz "......"
-pieces:
+...#
+...#
+..##

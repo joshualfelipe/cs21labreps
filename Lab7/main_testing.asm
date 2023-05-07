@@ -93,26 +93,22 @@ array:	.space 400	# Allocates 400 bytes for nodes. 10 nodes with 4 bytes (1 word
 .eqv	_j 10
 
 main:		
-		create_new_node(4,_a)
-		create_new_node(6,_b)
-		create_new_node(7,_c)
-		create_new_node(8,_d)
-		create_new_node(35,_e)
-		create_new_node(9,_f)
-		create_new_node(10,_g)
-		create_new_node(36,_h)
-		create_new_node(0,_i)
-		create_new_node(3,_j)
-	
-		link_node(_a,_b,NULL)
-		link_node(_b,_c,_d)
-		link_node(_c,_e, NULL)
-		link_node(_d,_f,_g)
-		link_node(_e,_h, NULL)
-		link_node(_f,_i, NULL)
-		link_node(_i,_j,NULL)
-		link_node(_j,NULL, NULL)
-	
+		create_new_node(3,_a)
+create_new_node(4,_b)
+create_new_node(5,_c)
+create_new_node(1,_d)
+create_new_node(8,_e)
+create_new_node(2,_f)
+create_new_node(7,_g)
+create_new_node(6,_h)
+link_node(_a,_b,_c)
+link_node(_b,_d,_e)
+link_node(_c,_f, NULL)
+link_node(_d,NULL,_g)
+link_node(_f,NULL, _h)
+link_node(_g,NULL, NULL)
+link_node(_h,NULL, NULL)
+
 		print_depth(_a)
 		print_even(_a,0)
 	

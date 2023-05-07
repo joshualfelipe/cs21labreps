@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+### DONE ###
 def is_equal_grids(gridOne, gridTwo):
     result = True
     for i in range(6 + 4):
@@ -12,7 +13,7 @@ def is_equal_grids(gridOne, gridTwo):
 #     for row in grid:
 #         print(''.join(row))
 
-
+### DONE ###
 def freeze_blocks(grid):
     for i in range(6 + 4):
         for j in range(6):
@@ -25,6 +26,8 @@ def get_max_x_of_piece(piece):
     max_x = -1
     for block in piece:
         max_x = max(max_x, block[1])
+        print(block)
+        print(max_x)
     return max_x
 
 
@@ -68,6 +71,10 @@ def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top l
                 pieceCoords.append([i, j])
     return pieceCoords
 
+"""
+int pieceCoords[][]
+"""
+
 def backtrack(currGrid, chosen, pieces):
     # print(chosen)
     # print_grid(currGrid)
@@ -89,14 +96,14 @@ def backtrack(currGrid, chosen, pieces):
     return result
 
 # initialize grids to have 4 empty rows
-
+### DONE ###
 start_grid = [['.' for _ in range(6)] for _ in range(4)]
 final_grid = [['.' for _ in range(6)] for _ in range(4)]
 
 # grids will be 10 rows by 6 columns, so we can put the piece at the top,
 # before letting it fall
 
-for _ in range(6):
+for _ in range(6): ### DONE ###
     line = input()
     row = [character for character in line]
     for j in range(len(row)):
@@ -104,7 +111,7 @@ for _ in range(6):
             row[j] = 'X'  # mark frozen blocks as 'X'
     start_grid.append(row)
 
-for _ in range(6):
+for _ in range(6): ### DONE ###
     line = input()
     row = [character for character in line]
     for j in range(len(row)):
@@ -112,16 +119,17 @@ for _ in range(6):
             row[j] = 'X'   # mark frozen blocks as 'X'
     final_grid.append(row)
 
-numPieces = int(input())
-chosen = [False for _ in range(numPieces)]  # tracks which piece has been used
-converted_pieces = []
-for _ in range(numPieces):
+numPieces = int(input()) ### DONE ###
+chosen = [False for _ in range(numPieces)] ### DONE ### # tracks which piece has been used
+converted_pieces = [] ### DONE ###
+for _ in range(numPieces):### DONE ###
     pieceAscii = []
     for _ in range(4):
         line = input()
         row = [character for character in line]
         pieceAscii.append(row)
     piecePairs = convert_piece_to_pairs(pieceAscii)
+    print(piecePairs)
     converted_pieces.append(piecePairs)
 
 
