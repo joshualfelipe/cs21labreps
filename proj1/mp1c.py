@@ -26,8 +26,8 @@ def get_max_x_of_piece(piece):
     max_x = -1
     for block in piece:
         max_x = max(max_x, block[1])
-        print(block)
-        print(max_x)
+        # print(block)
+        # print(max_x)
     return max_x
 
 
@@ -63,6 +63,7 @@ def drop_piece_in_grid(grid, piece, yOffset):
     else:
         return freeze_blocks(gridCopy), True
 
+### DONE ###
 def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top left of grid
     pieceCoords = []
     for i in range(4):
@@ -71,9 +72,6 @@ def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top l
                 pieceCoords.append([i, j])
     return pieceCoords
 
-"""
-int pieceCoords[][]
-"""
 
 def backtrack(currGrid, chosen, pieces):
     # print(chosen)
