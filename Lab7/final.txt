@@ -1,0 +1,37 @@
+.data
+#filename:	.asciiz "1.in"	# remove for stdin
+content:	.align 2		# word align
+	.space 96	# allocate 256 bytes
+
+.macro	print_register(%register)
+	move	$a0, %register
+	addi	$v0, $0, 34
+	syscall
+	
+	addi	$a0, $0, 10
+	addi	$v0, $0, 11
+	syscall
+.end_macro
+
+.macro	read_file(%bytes)
+	addi	$a0, $0, 0	# file descriptor for stdin, uncomment for stdin
+	la	$a1, content	# buffer address
+	addi	$a2, $0 %bytes	# number of bytes to take
+	
+	addi	$v0, $0, 14	# read from file
+	syscall
+.end_macro
+
+.text
+main:	
+	la	$s0, content	# get buffer address
+	read_file(12)		# reads 8 bytes from the input and saves it to the buffer address
+	lw	$t0, 0($s0)
+	lw	$t1, 4($s0)
+	
+	print_register($t0)
+	print_register($t1)
+	
+exit:
+	addi	$v0, $0, 10
+	syscall
