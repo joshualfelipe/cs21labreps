@@ -5,6 +5,17 @@
 
 # p + r * cols + c
 
+
+.macro	read_file(%bytes, %add)
+	#lw	$a0, 0($gp)	# load file descriptor saved in global memory, remove for stdin
+	li	$a0, 0	# file descriptor for stdin, uncomment for stdin
+	move	$a1, %add	# buffer address
+	addi	$a2, $0 %bytes	# number of bytes to take
+	
+	addi	$v0, $0, 14	# read from file
+	syscall
+.end_macro
+
 .macro init_arr(%p)
 	subi	$sp, $sp, 32
 	sw	$t0, 28($sp)
@@ -49,54 +60,31 @@ end_init_loop:
 	sw	$t2, 20($sp)
 	sw	$t3, 16($sp)
 	sw	$t4, 12($sp)
-	sw	$t5, 8($sp)
-	sw	$t6, 4($sp)
-	sw	$t7, 0($sp)
 	
-	la 	$t0, input_buffer   	# load address of input buffer
-    	li 	$t1, 6              	# loop counter for lines
-
 read_lines:
-    	li 	$v0, 8              	# syscall code 8 for read string
-    	move 	$a0, $t0          	# buffer address
-    	li 	$a1, 8	         	# maximum number of characters to read
-   	syscall                		# call the syscall to read input
-	move	$t2, $t0			# copy base address of input to t2
-	
-	li	$t5, 0			# counter = 0
-	li	$s4, 6			# numCols = 6
+	move	$t0, %p			# get buffer address
+	read_file(48, $t0)		# reads 48 bytes from the input and saves it to the buffer address
+	li	$t2, 0			# counter = 0
+	li	$t1, 48			# numCols = 6
 loop:
-	li	$t7, 0x23		# t7 = '#'
-	beq	$t5, $s4, end_loop	# counter < numCols
-	lb	$t6, 0($t2)		# rows[counter] == '#' ?
-	bne	$t6, $t7, go_back
-	li	$t7, 0x58		# True: rows[counter] = 'X'
-	sb	$t7, 0($t2)
+	li	$t4, 0x23		# t7 = '#'
+	beq	$t2, $t1, end_loop	# counter < numCols
+	lb	$t3, 0($t0)		# rows[counter] == '#' ?
+	bne	$t3, $t4, go_back
+	li	$t4, 0x58		# True: rows[counter] = 'X'
+	sb	$t4, 0($t0)
 go_back:
+	addi	$t0, $t0, 1		# t0++
 	addi	$t2, $t2, 1		# t2++
-	addi	$t5, $t5, 1		# t5++
 	j	loop
 	
 end_loop:	
-	lw 	$t3, 0($t0)		# grab the values in word[0]
-	lw 	$t4, 4($t0)		# grab values in word[1]
 	
-    	sw 	$t3, 0(%p)          	# store string at memory location
-    	sw 	$t4, 4(%p)		# store string at memory location
-
-    	addi	$t0, $t0, 8       	# increment buffer pointer by 8 bytes
-    	addi 	%p, %p, 8       		# increment memory pointer by 4 bytes
-    	addi 	$t1, $t1, -1      	# decrement line counter
-    	bnez	$t1, read_lines 		# loop until 6 lines have been read
-    	
     	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
 	lw	$t2, 20($sp)
 	lw	$t3, 16($sp)
 	lw	$t4, 12($sp)
-	lw	$t5, 8($sp)
-	lw	$t6, 4($sp)
-	lw	$t7, 0($sp)
 	addi	$sp, $sp, 32
 .end_macro
 
@@ -109,7 +97,7 @@ end_loop:
 	# tracks which piece has been used
 	# chosen = [False for _ in range(numPieces)] 
 	li	$t1, 0
-	li	$t2, 0
+	li	$t2, 2
 loop:
 	beq	%len, $t1, end
 	sb	$t2, 0(%arr)
@@ -130,48 +118,32 @@ end:
 	sw	$t1, 24($sp)
 	sw	$t2, 20($sp)
 	sw	$t3, 16($sp)
-	sw	$t4, 12($sp)
-	sw	$t5, 8($sp)
 
 	# This code asks for user to input the pieces and returns
 	# an array containing the piecePairs
+	move	$t0, %arr
 	li	$t1, 0
-	li	$t2, 4
-	la	$t4, input_buffer
-	move	$t5, $t4
-	la	$t3, pieceAscii	# pieceAscii = []
+	la	$t2, pieceAscii	# pieceAscii = []
 
 outer_loop:
 	beq	$t1, %len, end_outer_loop
 	
-inner_loop:
 	# row = [character for character in line]
-	li 	$v0, 8              	# syscall code 8 for read string
-    	move 	$a0, $t5          	# buffer address
-    	li 	$a1, 6           	# maximum number of characters to read
-   	syscall                		# call the syscall to read input
+	move	$t3, $t2			# get buffer address
+	read_file(24, $t3)		# reads 24 bytes from the input and saves it to the buffer address
 	
-	addi	$t5, $t5, 4
-	addi	$t2, $t2, -1
-	bne	$t2, $zero, inner_loop
-	
-	sw	$t4, 0($t3)		# pieceAscii.append(row)
-	move	$t4, $t5
-	convert_pieces_to_pairs($t3, $t1)# piecePairs = convert_piece_to_pairs(pieceAscii)
+	convert_pieces_to_pairs($t2, $t1)# piecePairs = convert_piece_to_pairs(pieceAscii)
 	addi	$t1, $t1, 1
 	sw	$v0, 0(%arr) 		# converted_pieces.append(piecePairs)
 	addi	%arr, %arr, 4		# move to next piece
 	addi	$t3, $t3, 4
-	li	$t2, 4
 	j	outer_loop
 	
 end_outer_loop:
 	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
 	lw	$t2, 20($sp)
-	lw	$t3, 16($sp)
-	lw	$t4, 12($sp)
-	lw	$t5, 8($sp)
+	lw	$t2, 16($sp)
 	addi	$sp, $sp, 32
 .end_macro 
 
@@ -184,7 +156,7 @@ end_outer_loop:
 	sw	$t4, 12($sp)
 	sw	$t5, 8($sp)
 	
-	li	$v0, %grid	# Returns grid
+	move	$v0, %grid	# Returns grid
 	li	$t0, 0
 	li	$t1, 0
 	li	$t2, 10
@@ -267,12 +239,12 @@ end_loop:
 	sw	$t3, 8($sp)
 	sw	$t4, 4($sp)
 	
+	move	$s1, %arr
 	la	$s0, pieceCoords
 	move	$t4, %inc
 	sll	$t4, $t4, 4
 	add	$s0, $s0, $t4
 	move	$t2, $s0
-	lw	$s1, 0(%arr)
 	li	$t0, 0		# initialize i
 	li	$t1, 0		# initialize j
 
@@ -299,6 +271,7 @@ piece_found:
 end_j:
 	addi	$t0, $t0, 1
 	li	$t1, 0
+	addi	$s1, $s1, 2
 	j	loop_i
 
 end_i:
@@ -322,10 +295,9 @@ end_i:
 	sw	$t4, 8($sp)
 	
 	li	$t0, %pos
-	sll	$t0, $t0, 3
+	sll	$t0, $t0, 4
 	addi	$t1, $t0, 4
-	move	$t3, %piece
-	lw	$t3, 0($t3)
+	lw	$t3, 0(%piece)
 	add	$t3, $t3, $t0
 	li	$t2, -1
 	
@@ -412,35 +384,49 @@ end:
 	move	$s2, $s0		# S2 copy of base address of S0
 	move	$s3, $s1		# S3 copy of base address of S1
 	
-	##### GET INPUTS #####
+	# remove this whole block for stdin, no setup is required in that case, only the read_file macro
+	#la	$a0, filename	# opens the file based on filename in .data directive
+	#li	$a1, 0
+	#li	$a2, 0
+	#li	$v0, 13	# open file
+	#syscall
+	#sw	$v0, 0($gp)	# save the file descriptor as a global variable
+	# remove until here for stdin
+	
+	##### GET STARTING AND FINAL GRID #####
 	init_arr($s2)
 	init_arr($s3)
 	get_input($s2)
 	get_input($s3)
-
-	#li	$v0, 5			# Get integer from user
-	#syscall
-	#move	$s2, $v0
-	#li	$s2, 2
 	
-	#la	$s3, chosen
-	#move	$t0, $s3		# make copy of address of s3
-	#init_chosen($s2, $t0)
-
-	#la	$s4, converted_pieces
-	#move	$t0, $s4		# make copy of address of s4
-	#get_pieces($s2, $t0)
+	##### GET INTEGER INPUT #####
+	la	$t0, int			# get buffer address
+	read_file(3, $t0)		# reads 1 bytes from the input and saves it to the buffer address
+	li	$t2, 0			# counter = 0
+	li	$t1, 1			# numCols = 6
+	lb	$s2, 0($t0)
+	subi	$s2, $s2, 0x30		# removes the extra
+	
+	##### INITIALIZE CHOSEN PIECES ARRAY #####
+	la	$s3, chosen
+	move	$t0, $s3		# make copy of address of s3
+	init_chosen($s2, $t0)
+	
+	##### GET PIECCES INPUT #####
+	la	$s4, converted_pieces
+	move	$t0, $s4		# make copy of address of s4
+	get_pieces($s2, $t0)
 	
 	##### WORKING FUCNTION CALLS #####
-	#get_max_x_of_piece($s4, 0)
-	#freeze_blocks($t7)
+	get_max_x_of_piece($s4, 4)
+	#freeze_blocks($v0)
 	#is_equal_grids($s0, $s1)
-	#deepcopy($s3, 1)
+	#deepcopy($s1, 10)
 	#move	$s5, $v0
 		
-	#li	$v0, 1
-	#move	$a0, $s5
-	#syscall
+	li	$v0, 1
+	move	$a0, $s5
+	syscall
 	
     	li $v0, 10             # exit program
     	syscall
@@ -449,6 +435,7 @@ end:
 .data
 start_grid:	.space 96	# allocate space for a 4x6x4 char array
 final_grid:	.space 96	# allocate space for a 4x6x4 char array
+int:		.space 8
 chosen:		.space 24	# allocate space for 4x6 bool array 
 converted_pieces:.space 24	# allocate space for 4x6 converted pieces array 
 pieceAscii:	.space 96	# allocate 4x4x6 for pieceAscii
@@ -456,11 +443,7 @@ pieceCoords:	.space 96	# allocate 4x4x6 for pieceCoords
 input_buffer:   .space 8		# space to hold input string
 deep_grid:	.space 96
 deep_chosen:	.space 24
-
+filename:	.asciiz "test.in"
 
 yes:		.asciiz "\nYes"
 no:		.asciiz "\nNo"
-#prompt:         .asciiz "Enter a string: "
-#_file:	.asciiz "1.in"
-#input_buffer:	.space 8
-#he: .asciiz "Input read successfully!\n"

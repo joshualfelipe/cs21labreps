@@ -33,8 +33,8 @@ def get_max_x_of_piece(piece):
 
 
 def drop_piece_in_grid(grid, piece, yOffset):
-    gridCopy = deepcopy(grid)
-    maxY = 100
+    gridCopy = [[grid[i][j] for j in range(6)] for i in range(4 + 6)]
+    maxY = 9
     for block in piece:
         gridCopy[block[0]][block[1] + yOffset] = '#'  # put piece in grid
     #  only active blocks are '#'; frozen blocks are 'X'
@@ -44,7 +44,10 @@ def drop_piece_in_grid(grid, piece, yOffset):
             for j in range(6):
                 if gridCopy[i][j] == '#' and (i + 1 == 10 or gridCopy[i + 1][j] == 'X'):
                     canStillGoDown = False
-        
+                    break  # terminate inner loop as soon as we find a cell that cannot move down
+            if not canStillGoDown:
+                break  # terminate outer loop if we can't move any cells down
+
         if canStillGoDown:
             for i in range(8, -1, -1):  # move cells of piece down, starting from bottom cells
                 for j in range(6):
@@ -64,6 +67,7 @@ def drop_piece_in_grid(grid, piece, yOffset):
     else:
         return freeze_blocks(gridCopy), True
 
+
 ### DONE ###
 def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top left of grid
     pieceCoords = []
@@ -75,24 +79,21 @@ def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top l
 
 
 def backtrack(currGrid, chosen, pieces):
-    # print(chosen)
-    # print_grid(currGrid)
-    # print()
-    result = False
     if is_equal_grids(currGrid, final_grid):
         return True
+    chosen_copy = chosen[:]
     for i in range(len(chosen)):
         if not chosen[i]:
             max_x_of_piece = get_max_x_of_piece(pieces[i])
-            chosenCopy = deepcopy(chosen)  # copy of chosen
             for offset in range(6 - max_x_of_piece):
                 nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
                 if success:
-                    chosenCopy[i] = True
-                    result = result or backtrack(nextGrid, chosenCopy, pieces)
-                    if result:
+                    chosen_copy[i] = True
+                    if backtrack(nextGrid, chosen_copy, pieces):
                         return True
-    return result
+                    chosen_copy[i] = False
+    return False
+
 
 # initialize grids to have 4 empty rows
 ### DONE ###
