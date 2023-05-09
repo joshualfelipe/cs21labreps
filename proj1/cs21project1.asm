@@ -7,8 +7,8 @@
 
 
 .macro	read_file(%bytes, %add)
-	#lw	$a0, 0($gp)	# load file descriptor saved in global memory, remove for stdin
-	li	$a0, 0	# file descriptor for stdin, uncomment for stdin
+	lw	$a0, 0($gp)	# load file descriptor saved in global memory, remove for stdin
+	#li	$a0, 0	# file descriptor for stdin, uncomment for stdin
 	move	$a1, %add	# buffer address
 	addi	$a2, $0 %bytes	# number of bytes to take
 	
@@ -97,7 +97,7 @@ end_loop:
 	# tracks which piece has been used
 	# chosen = [False for _ in range(numPieces)] 
 	li	$t1, 0
-	li	$t2, 2
+	li	$t2, 0
 loop:
 	beq	%len, $t1, end
 	sb	$t2, 0(%arr)
@@ -294,7 +294,7 @@ end_i:
 	sw	$t3, 12($sp)
 	sw	$t4, 8($sp)
 	
-	li	$t0, %pos
+	move	$t0, %pos
 	sll	$t0, $t0, 4
 	addi	$t1, $t0, 4
 	lw	$t3, 0(%piece)
@@ -323,7 +323,6 @@ end:
 
 .macro deepcopy(%arr, %len)
 	# Creates a deepcopy of either the chosen array or grid.
-	# TO EDIT: Possible implement on a heap
 	subi	$sp, $sp, 32
 	sw	$t0, 28($sp)
 	sw	$t1, 24($sp)
@@ -332,35 +331,54 @@ end:
 	sw	$t4, 12($sp)
 	
 	li	$t4, %len
-	li	$t0, 0
 	move	$t1, %arr
-	la	$t2, deep_grid
-	beq	$t4, 0xa, grid
-	la	$t2, deep_chosen
-	j	chosen
-grid:
-	beq	$t0, 20, end_grid
-	lw	$t3, 0($t1)
-	sw	$t3, 0($t2)
-	addi	$t1, $t1, 4
-	addi	$t2, $t2, 4
-	addi	$t0, $t0, 1
-	j 	grid
+	beq	$t4, 0xa, deep_copy_grid	# If 10, grid. Else, chosen
+	j	deep_copy_chosen
 	
-chosen:
-	beq	$t0, 2, end_chosen
-	lw	$t3, 0($t1)
-	sw	$t3, 0($t2)
-	addi	$t1, $t1, 4
-	addi	$t2, $t2, 4
-	addi	$t0, $t0, 1
-	j 	chosen
+deep_copy_grid:
+	li	$t0, 96		# allocate 24 bytes for the copy
+	li 	$v0, 9  	# system call for memory allocation
+	move 	$a0, $t0
+	syscall
+	move 	$t3, $v0  	# save the address of the allocated memory to $t3
+	
+	# loop to copy chosen to chosen_copy
+	li 	$t4, 0
+	li 	$t5, 0
+grid_copy_loop:
+    	lw 	$t4, 0($t1)
+    	sw 	$t4, 0($t3)
+    	addi 	$t1, $t1, 4
+    	addi 	$t3, $t3, 4
+    	addi 	$t5, $t5, 1
+    	blt 	$t5, 20, grid_copy_loop
+	j	end_grid
+	
+deep_copy_chosen:
+	li	$t0, 8		# allocate 8 bytes for the copy
+	li 	$v0, 9  	# system call for memory allocation
+	move 	$a0, $t0
+	syscall
+	move 	$t3, $v0  	# save the address of the allocated memory to $t3
+
+	# loop to copy chosen to chosen_copy
+	li 	$t4, 0
+	li 	$t5, 0
+chosen_copy_loop:
+    	lw 	$t4, 0($t1)
+    	sw 	$t4, 0($t3)
+    	addi 	$t1, $t1, 4
+    	addi 	$t3, $t3, 4
+    	addi 	$t5, $t5, 1
+    	blt 	$t5, 2, chosen_copy_loop
+
+end_chosen:
+	move	$v0, $t3
+	j	end
 	
 end_grid:
-	la	$v0, deep_grid
-	j	end
-end_chosen:
-	la	$v0, deep_chosen
+	move	$v0, $t3
+
 end:	
 	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
@@ -368,6 +386,93 @@ end:
 	lw	$t3, 16($sp)
 	lw	$t4, 12($sp)
 	addi	$sp, $sp, 32
+.end_macro 
+
+# USED TEMP VARS: T1-T3
+.macro backtrack(%currGrid, %chosen, %pieces, %len)
+# REMOVE FROM MACRO
+	addi	$sp, $sp, 32
+	sw	$s0, 28($sp)
+	sw	$s1, 24($sp)
+	sw	$s2, 20($sp)
+	sw	$s3, 16($sp)
+	sw	$s4, 12($sp)
+	sw	$s5, 8($sp)
+	sw	$ra, 4($sp)
+	
+	move	$s0, %currGrid
+	la	$s1, final_grid
+	move	$s2, %len
+	move	$s3, %chosen
+	move	$s4, %pieces
+	
+		
+	is_equal_grids($s0, $s1)
+	bnez	$v0, return_true
+	
+else:
+	deepcopy($s3, 2)
+	move	$s5, $v0	# chosen_copy = chosen[:]
+	
+	li	$t1, 0		# initialize i
+loop_i:
+	beq	$t1, $s2, end
+	lb	$t2, 0($s3)		# chosen[i]
+	xori	$t2, $t2, 1
+	beqz	$t2, loop_back_to_i	# if not chosen[i]:
+	
+	get_max_x_of_piece($s4, $t1)	# get_max_x_of_piece(pieces[i])
+	move	$t3, $v0		#  max_x_of_piece
+
+	#  for offset in range(6 - max_x_of_piece):
+	li	$t5, 6
+	sub	$t3, $t5, $t3	 	# range(6 - max_x_of_piece)
+	li	$t5, 0
+	
+loop_offset:
+	beq	$t5, $t3, loop_back_to_i
+	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
+	# ASSUMPTION $v0 = nextGrid & $v1 = success
+	
+	bnez	$v1, loop_back_to_offset	# if success:
+	li	$t0, 1
+	sb	$t0, 0($s5)	# chosen_copy[i] = True
+	
+	move	$a0, $v0
+	move	$a1, $s5
+	move	$a2, $s4
+	backtrack($a0, $a1, $a2, $s2)
+	move	$t6, $v0	# backtrack(nextGrid, chosen_copy, pieces)
+	bnez	$t6, return_true
+	
+	li	$t0, 0
+	sb	$t0, 0($s5)	# chosen_copy[i] = False
+	
+loop_back_to_offset:
+	addi	$t5, $t5, 1
+	j	loop_offset
+	
+loop_back_to_i:
+	addi	$t1, $t1, 1
+	addi	$s3, $s3, 1
+	addi	$s5, $s5, 1
+	j	loop_i
+
+return_false:
+	li	$v0, 0
+	j	end
+	
+return_true:
+	li	$v0, 1
+end:
+	lw	$s0, 28($sp)
+	lw	$s1, 24($sp)
+	lw	$s2, 20($sp)
+	lw	$s3, 16($sp)
+	lw	$s4, 12($sp)
+	lw	$s5, 8($sp)
+	lw	$ra, 4($sp)
+	subi	$sp, $sp, 32
 .end_macro 
 
 ###### DO NOT MODIFY THESE REGISTERS ######
@@ -385,12 +490,12 @@ end:
 	move	$s3, $s1		# S3 copy of base address of S1
 	
 	# remove this whole block for stdin, no setup is required in that case, only the read_file macro
-	#la	$a0, filename	# opens the file based on filename in .data directive
-	#li	$a1, 0
-	#li	$a2, 0
-	#li	$v0, 13	# open file
-	#syscall
-	#sw	$v0, 0($gp)	# save the file descriptor as a global variable
+	la	$a0, filename	# opens the file based on filename in .data directive
+	li	$a1, 0
+	li	$a2, 0
+	li	$v0, 13	# open file
+	syscall
+	sw	$v0, 0($gp)	# save the file descriptor as a global variable
 	# remove until here for stdin
 	
 	##### GET STARTING AND FINAL GRID #####
@@ -402,8 +507,6 @@ end:
 	##### GET INTEGER INPUT #####
 	la	$t0, int			# get buffer address
 	read_file(3, $t0)		# reads 1 bytes from the input and saves it to the buffer address
-	li	$t2, 0			# counter = 0
-	li	$t1, 1			# numCols = 6
 	lb	$s2, 0($t0)
 	subi	$s2, $s2, 0x30		# removes the extra
 	
@@ -416,17 +519,80 @@ end:
 	la	$s4, converted_pieces
 	move	$t0, $s4		# make copy of address of s4
 	get_pieces($s2, $t0)
+	lw	$s4, 0($s4)
 	
 	##### WORKING FUCNTION CALLS #####
-	get_max_x_of_piece($s4, 4)
+	#li $t0, 0
+	#get_max_x_of_piece($s4, $t0)
 	#freeze_blocks($v0)
 	#is_equal_grids($s0, $s1)
 	#deepcopy($s1, 10)
+	#deepcopy($s3, 2)
+	#move $t0, $v0
+	
+	
+	##### BACKTRACK #####
+	#backtrack($s0, $s3, $s4, $s2)
+
 	#move	$s5, $v0
 		
-	li	$v0, 1
-	move	$a0, $s5
-	syscall
+	move	$a0, $s0	# grid
+	move	$a1, $s4	# piece
+	li	$a2, 1		# offset (hard coded for now)
+
+drop_piece_in_grid:
+	subi	$sp, $sp, 32
+	sw	$s5, 28($sp)
+	sw	$s6, 24($sp)
+	sw	$s7, 20($sp)
+	sw	$t0, 16($sp)
+	
+	move	$s5, $a0
+	move	$s6, $a1
+	move	$s7, $a2
+	
+	deepcopy($a0, 10)
+	subi	$v0, $v0, 0x50
+	move	$t0, $v0	# gridCopy
+	
+	# for block in piece:
+	li	$t7, 0
+	subi	$sp, $sp, 4
+	sw	$s6, 0($sp)
+loop_block:
+	# gridCopy[block[0]][block[1] + yOffset] = '#' 
+	subi	$sp, $sp, 4
+	sw	$t0, 0($sp)
+	
+	lb	$t4, 0($s6)	# block[0]
+	lb	$t5, 2($s6)	# block[1]
+	add	$t5, $t5, $s7	# block[1] + yoffset
+	
+	# p + r * cols + c
+	li	$t6, 8
+	mult	$t4, $t6
+	mflo	$t4
+	
+	add	$t4, $t4, $t5
+	add	$t0, $t0, $t4
+	
+	li	$t6, 0x23
+	sb	$t6, 0($t0)
+	
+	addi	$s6, $s6, 4
+	addi	$t7, $t7, 1
+	
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	bne	$t7, 4, loop_block
+	
+	lw	$s6, 0($sp)
+	addi	$sp, $sp, 4
+
+
+	#li	$v0, 1
+	#move	$a0, $s5
+	#syscall
 	
     	li $v0, 10             # exit program
     	syscall

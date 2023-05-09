@@ -37,7 +37,13 @@ def drop_piece_in_grid(grid, piece, yOffset):
     maxY = 9
     for block in piece:
         gridCopy[block[0]][block[1] + yOffset] = '#'  # put piece in grid
+        print(block)
     #  only active blocks are '#'; frozen blocks are 'X'
+
+    # for k in range(len(gridCopy)):
+    #     print(gridCopy[k])
+    # print()
+
     while True:
         canStillGoDown = True
         for i in range(4 + 6):
@@ -79,6 +85,9 @@ def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top l
 
 
 def backtrack(currGrid, chosen, pieces):
+    # print(chosen)
+    # print_grid(currGrid)
+    # print()
     if is_equal_grids(currGrid, final_grid):
         return True
     chosen_copy = chosen[:]
@@ -87,6 +96,10 @@ def backtrack(currGrid, chosen, pieces):
             max_x_of_piece = get_max_x_of_piece(pieces[i])
             for offset in range(6 - max_x_of_piece):
                 nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
+                print(len(nextGrid))
+                for k in range(len(nextGrid)):
+                    print(nextGrid[k])
+                print()
                 if success:
                     chosen_copy[i] = True
                     if backtrack(nextGrid, chosen_copy, pieces):
@@ -129,7 +142,7 @@ for _ in range(numPieces):### DONE ###
         row = [character for character in line]
         pieceAscii.append(row)
     piecePairs = convert_piece_to_pairs(pieceAscii)
-    print(piecePairs)
+    # print(piecePairs)
     converted_pieces.append(piecePairs)
 
 
