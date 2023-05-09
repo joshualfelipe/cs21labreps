@@ -163,8 +163,10 @@ end_outer_loop:
 	sw	$t3, 16($sp)
 	sw	$t4, 12($sp)
 	sw	$t5, 8($sp)
+	sw	$t6, 4($sp)
 	
 	move	$v0, %grid	# Returns grid
+	move	$t6, $v0
 	li	$t0, 0
 	li	$t1, 0
 	li	$t2, 10
@@ -174,16 +176,16 @@ loop1:
 	beq	$t0, $t2, end_loop	# for i in range(6 + 4):
 loop2:
 	beq	$t1, $t3, end_loop2	# for j in range(6):
-	lb	$t4, 0(%grid)
+	lb	$t4, 0($t6)
 	bne	$t4, 0x23, increment	# if grid[i][j] == '#':
-	sb	$t5, 0(%grid)		# grid[i][j] = 'X'
+	sb	$t5, 0($t6)		# grid[i][j] = 'X'
 	
 increment:
 	addi	$t1, $t1, 1
-	addi	%grid, %grid, 1
+	addi	$t6, $t6, 1
 	j	loop2
 end_loop2:
-	addi	%grid, %grid, 2
+	addi	$t6, $t6, 2
 	addi	$t0, $t0, 1
 	li	$t1, 0
 	j	loop1
@@ -196,6 +198,7 @@ end_loop:
 	lw	$t3, 16($sp)
 	lw	$t4, 12($sp)
 	lw	$t5, 8($sp)
+	lw	$t6, 4($sp)
 	addi	$sp, $sp, 32
 .end_macro 
 
@@ -442,14 +445,24 @@ loop_offset:
 	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
 	# ASSUMPTION $v0 = nextGrid & $v1 = success
 	
+	subi	$sp, $sp, 4
+	sw	$t1, 0($sp)
+	sll	$t1, $t1, 4
+	add	$t1, $t1, $s4
+	
+	drop_piece_in_grid($s0, $t1, $t5)
+	
 	bnez	$v1, loop_back_to_offset	# if success:
 	li	$t0, 1
 	sb	$t0, 0($s5)	# chosen_copy[i] = True
 	
+	lw	$t1, 0($sp)
+	addi	$sp, $sp, 4
+	
 	move	$a0, $v0
 	move	$a1, $s5
 	move	$a2, $s4
-	backtrack($a0, $a1, $a2, $s2)
+	backtrack($a0, $a1, $a2, $s2)	# PROBLEM HERE !!!
 	move	$t6, $v0	# backtrack(nextGrid, chosen_copy, pieces)
 	bnez	$t6, return_true
 	
@@ -483,7 +496,227 @@ end:
 	subi	$sp, $sp, 32
 .end_macro 
 
+.macro drop_piece_in_grid(%grid, %piece, %offset)
+	# OFFLIMIT REGISTERS
+	subi	$sp, $sp, 32
+	sw	$s5, 28($sp)
+	sw	$s6, 24($sp)
+	sw	$s7, 20($sp)
+	sw	$t0, 16($sp)
+	
+	move	$s5, %grid
+	move	$s6, %piece
+	move	$s7, %offset
+	
+	deepcopy($s5, 10)
+	subi	$v0, $v0, 0x50
+	move	$t0, $v0	# gridCopy
+	
+	# for block in piece:
+	li	$t7, 0
+	subi	$sp, $sp, 4
+	sw	$s6, 0($sp)
+loop_block:
+	# gridCopy[block[0]][block[1] + yOffset] = '#' 
+	subi	$sp, $sp, 4
+	sw	$t0, 0($sp)
+	
+	lb	$t4, 0($s6)	# block[0]
+	lb	$t5, 2($s6)	# block[1]
+	add	$t5, $t5, $s7	# block[1] + yoffset
+	
+	# p + r * cols + c
+	li	$t6, 8
+	mult	$t4, $t6
+	mflo	$t4
+	
+	add	$t4, $t4, $t5
+	add	$t0, $t0, $t4
+	
+	li	$t6, 0x23
+	sb	$t6, 0($t0)
+	
+	addi	$s6, $s6, 4
+	addi	$t7, $t7, 1
+	
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	bne	$t7, 4, loop_block
+	
+	lw	$s6, 0($sp)
+	addi	$sp, $sp, 4
+	
+	# DO NOT TOUCH REGISTERS: T0, T1, T2, T3
+loop_forever:
+	li	$t1, 0x1	# canStillGoDown
+	li	$t2, 0		# initialize i
+
+loop_i:
+	beq	$t2, 10, end_loop_i
+	li	$t3, 0		# initialize j
+	
+loop_j:
+	beq	$t3, 6, end_loop_j
+	subi	$sp, $sp, 4
+	sw	$t0, 0($sp)
+	# t0 is gridCopy
+	
+	move	$t4, $t2	# i
+	move	$t5, $t3	# j
+	#move	$t9, $t2
+	
+	# p + i * 8 + j
+	sll	$t4, $t4, 3
+	add	$t4, $t4, $t5
+	add	$t0, $t0, $t4
+	lb	$t9, 0($t0)
+	bne	$t9, '#', go_back_to_j
+	
+	move	$t4, $t2	# i
+	move	$t5, $t3	# j
+	addi	$t4, $t4, 1
+	bne	$t4, 10, check_next
+	j	skip_check
+	
+check_next:
+	sll	$t4, $t4, 3
+	add	$t4, $t4, $t5
+	lw	$t0, 0($sp)
+	add	$t0, $t0, $t4
+	lb	$t9, 0($t0)
+	bne	$t9, 'X', go_back_to_j
+
+skip_check:
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	li	$t1, 0x0
+	j	end_loop_j
+
+go_back_to_j:
+	addi	$t3, $t3, 1
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	j	loop_j	
+	
+end_loop_j:
+	addi	$t2, $t2, 1
+	li	$t3, 0
+	beqz	$t1, end_loop_i		# if not canStillGoDown:
+	j	loop_i
+
+end_loop_i:
+	beqz	$t1, end_loop_forever	
+	# if canStillGoDown:
+	# DO NOT TOUCH REGISTERS FOR THIS PART: T0, T1, T2
+	li	$t8, 8		# i
+
+loop_down_i:
+	li	$t2, 0		# j
+loop_down_j:		
+	subi	$sp, $sp, 4
+	sw	$t0, 0($sp)
+	
+	move	$t3, $t8
+	move	$t4, $t2
+	move	$t6, $t0
+	
+	# p + i * 8 + j
+	# gridCopy[i][j] == '#'
+	sll	$t3, $t3, 3
+	add	$t3, $t4, $t3
+	add	$t6, $t6, $t3
+	lb	$t5, 0($t6)
+	bne	$t5, 0x23, skip
+	
+	# gridCopy[i][j] = '.'
+	li	$t7, 0x2e
+	sb	$t7, 0($t6)
+	
+	# gridCopy[i + 1][j] = '#'
+	move	$t3, $t8
+	move	$t6, $t0
+	addi	$t3, $t3, 1
+	sll	$t3, $t3, 3
+	add	$t3, $t4, $t3
+	add	$t6, $t6, $t3
+	
+	li	$t7, 0x23
+	sb	$t7, 0($t6)
+	
+skip:
+	#move	$t7, $a0
+	#print($t0)
+	#la	$a0, newline
+ 	#li 	$v0, 4
+  	#syscall
+  	#move	$a0, $t7
+  	
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	addi	$t2, $t2, 1
+	bne	$t2, 6, loop_down_j
+	subi	$t8, $t8, 1
+	bnez	$t8, loop_down_i
+	j	loop_forever
+	
+end_loop_forever:
+	# for i in range(4 + 6):
+	
+	li	$t1, 9		# maxY
+	li	$t2, 0		# i
+
+loop_outside_i:
+	li	$t3, 0		# j
+loop_outside_j:	
+	subi	$sp, $sp, 4
+	sw	$t0, 0($sp)
+	
+	move	$t4, $t2
+	move	$t5, $t3
+	move	$t6, $t0
+	
+	# p + i * 8 + j
+	# gridCopy[i][j] == '#'
+	sll	$t4, $t4, 3
+	add	$t4, $t4, $t5
+	add	$t6, $t6, $t4
+	lb	$t7, 0($t6)
+	bne	$t7, 0x23, skip_outside
+	
+	# maxY = min(maxY, i)
+	blt	$t1, $t2, skip_outside	# maxY < i
+	move	$t1, $t2
+	
+skip_outside:
+	lw	$t0, 0($sp)
+	addi	$sp, $sp, 4
+	addi	$t3, $t3, 1
+	bne	$t3, 6, loop_outside_j
+	addi	$t2, $t2, 1
+	bne	$t2, 10, loop_outside_i
+	
+	ble	$t1, 3, ret_grid_F
+	freeze_blocks($t0)
+	move	$v0, $t0
+	li	$v1, 0x1
+	j	end_of_piece_drop
+ret_grid_F:
+	move	$v0, $s5
+	li	$v1, 0x0
+end_of_piece_drop:
+	lw	$s5, 28($sp)
+	lw	$s6, 24($sp)
+	lw	$s7, 20($sp)
+	lw	$t0, 16($sp)
+	addi	$sp, $sp, 32
+.end_macro 
+
 .macro print(%add)
+	subi	$sp, $sp, 32
+	sw	$t1, 0($sp)
+	sw	$t2, 4($sp)
+	sw	$t3, 8($sp)
+	
 	li	$t1, 0
 	move	$t3, %add
 loop:
@@ -492,9 +725,15 @@ loop:
 	move	$a0, $t2
  	li 	$v0, 11
   	syscall
+  	
 	addi	$t1, $t1, 1
 	addi	$t3, $t3, 1	
 	blt	$t1, 80, loop
+	
+	lw	$t1, 0($sp)
+	lw	$t2, 4($sp)
+	lw	$t3, 8($sp)
+	addi	$sp, $sp, 32
 .end_macro
 
 ###### DO NOT MODIFY THESE REGISTERS ######
@@ -550,9 +789,8 @@ loop:
 	#is_equal_grids($s0, $s1)
 	#deepcopy($s1, 10)
 	#deepcopy($s3, 2)
+	#drop_piece_in_grid($a0, $a1, $a2)
 	#move $t0, $v0
-	
-	
 	##### BACKTRACK #####
 	#backtrack($s0, $s3, $s4, $s2)
 
@@ -561,70 +799,16 @@ loop:
 	##### DROP PIECE IN GRID #####
 	move	$a0, $s0	# grid
 	move	$a1, $s4	# piece
-	li	$a2, 1		# offset (hard coded for now)
+	li	$a2, 2		# offset (hard coded for now)
 
-drop_piece_in_grid:
-	subi	$sp, $sp, 32
-	sw	$s5, 28($sp)
-	sw	$s6, 24($sp)
-	sw	$s7, 20($sp)
-	sw	$t0, 16($sp)
-	
-	move	$s5, $a0
-	move	$s6, $a1
-	move	$s7, $a2
-	
-	deepcopy($a0, 10)
-	subi	$v0, $v0, 0x50
-	move	$t0, $v0	# gridCopy
-	
-	# for block in piece:
-	li	$t7, 0
-	subi	$sp, $sp, 4
-	sw	$s6, 0($sp)
-loop_block:
-	# gridCopy[block[0]][block[1] + yOffset] = '#' 
-	subi	$sp, $sp, 4
-	sw	$t0, 0($sp)
-	
-	lb	$t4, 0($s6)	# block[0]
-	lb	$t5, 2($s6)	# block[1]
-	add	$t5, $t5, $s7	# block[1] + yoffset
-	
-	# p + r * cols + c
-	li	$t6, 8
-	mult	$t4, $t6
-	mflo	$t4
-	
-	add	$t4, $t4, $t5
-	add	$t0, $t0, $t4
-	
-	li	$t6, 0x23
-	sb	$t6, 0($t0)
-	
-	addi	$s6, $s6, 4
-	addi	$t7, $t7, 1
-	
-	lw	$t0, 0($sp)
-	addi	$sp, $sp, 4
-	bne	$t7, 4, loop_block
-	
-	lw	$s6, 0($sp)
-	addi	$sp, $sp, 4
-	
-	move	$v0, $t0
-	lw	$s5, 28($sp)
-	lw	$s6, 24($sp)
-	lw	$s7, 20($sp)
-	lw	$t0, 16($sp)
-	addi	$sp, $sp, 32
 	
 	
 	##### TESTING #####
-	move	$t0, $v0
-	print($t0)
+	#move	$t0, $v0
+	#print($t0)
+	#move	$t0, $v0
 	#li	$v0, 1
-	#move	$a0, $s5
+	#move	$a0, $t0
 	#syscall
 	
     	li $v0, 10             # exit program
@@ -644,5 +828,6 @@ deep_grid:	.space 96
 deep_chosen:	.space 24
 filename:	.asciiz "test.in"
 
+newline:	.asciiz "\n\n"
 yes:		.asciiz "\nYes"
 no:		.asciiz "\nNo"

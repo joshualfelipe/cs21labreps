@@ -62,6 +62,8 @@ def drop_piece_in_grid(grid, piece, yOffset):
                         gridCopy[i][j] = '.'
         else:
             break
+    for i in range(10):
+        print(gridCopy[i])
     
     for i in range(4 + 6):
         for j in range(6):
