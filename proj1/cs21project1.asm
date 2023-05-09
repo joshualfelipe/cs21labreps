@@ -38,9 +38,17 @@ init_loop:
 	j	init_loop
 
 end_inner_init_loop:
+	li	$t5, 0x0d
+	sb	$t5, 0(%p)			# store '\r' into memory
+	addi	%p, %p, 1			# increase value of base address
+	
+	li	$t5, 0x0a
+	sb	$t5, 0(%p)			# store '\n' into memory
+	addi	%p, %p, 1			# increase value of base address
+	
 	li	$t1, 0				# set c = 0
 	addi	$t0, $t0, 1			# r++
-	addi	%p, %p, 2			# # To change if aayusin yung inputs Skip halfword to balance rows with 2 words each
+	#addi	%p, %p, 2			# # To change if aayusin yung inputs Skip halfword to balance rows with 2 words each
 	j	init_loop
 
 end_init_loop:
@@ -475,6 +483,20 @@ end:
 	subi	$sp, $sp, 32
 .end_macro 
 
+.macro print(%add)
+	li	$t1, 0
+	move	$t3, %add
+loop:
+	lb	$t2, ($t3)
+	
+	move	$a0, $t2
+ 	li 	$v0, 11
+  	syscall
+	addi	$t1, $t1, 1
+	addi	$t3, $t3, 1	
+	blt	$t1, 80, loop
+.end_macro
+
 ###### DO NOT MODIFY THESE REGISTERS ######
 # S0 base address of start grid
 # S1 base address of final grid
@@ -535,7 +557,8 @@ end:
 	#backtrack($s0, $s3, $s4, $s2)
 
 	#move	$s5, $v0
-		
+	
+	##### DROP PIECE IN GRID #####
 	move	$a0, $s0	# grid
 	move	$a1, $s4	# piece
 	li	$a2, 1		# offset (hard coded for now)
@@ -588,8 +611,18 @@ loop_block:
 	
 	lw	$s6, 0($sp)
 	addi	$sp, $sp, 4
-
-
+	
+	move	$v0, $t0
+	lw	$s5, 28($sp)
+	lw	$s6, 24($sp)
+	lw	$s7, 20($sp)
+	lw	$t0, 16($sp)
+	addi	$sp, $sp, 32
+	
+	
+	##### TESTING #####
+	move	$t0, $v0
+	print($t0)
 	#li	$v0, 1
 	#move	$a0, $s5
 	#syscall
