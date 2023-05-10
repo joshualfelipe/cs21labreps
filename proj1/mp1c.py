@@ -28,7 +28,7 @@ def get_max_x_of_piece(piece):
     for block in piece:
         max_x = max(max_x, block[1])
         # print(block)
-        # print(max_x)
+    print(max_x)
     return max_x
 
 
@@ -98,10 +98,10 @@ def backtrack(currGrid, chosen, pieces):
             max_x_of_piece = get_max_x_of_piece(pieces[i])
             for offset in range(6 - max_x_of_piece):
                 nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
-                print(len(nextGrid))
-                for k in range(len(nextGrid)):
-                    print(nextGrid[k])
-                print()
+                # print(len(nextGrid))
+                # for k in range(len(nextGrid)):
+                #     print(nextGrid[k])
+                # print()
                 if success:
                     chosen_copy[i] = True
                     if backtrack(nextGrid, chosen_copy, pieces):

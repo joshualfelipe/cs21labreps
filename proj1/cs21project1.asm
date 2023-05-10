@@ -213,7 +213,7 @@ end_loop:
 	sw	$t6, 4($sp)
 	
 	li	$t0, 0
-	li	$t2, 10
+	li	$t2, 20
 	li	$v0, 0x1
 loop1:
 	beq	$t0, $t2, end_loop	# for i in range(6 + 4):
@@ -224,8 +224,8 @@ loop1:
 	addi	%final, %final, 4
 end_loop2:
 	addi	$t0, $t0, 1
-	addi	%start, %start, 4	# To change if aayusin yung inputs
-	addi	%final, %final, 4	# To change if aayusin yung inputs
+	#addi	%start, %start, 4	# To change if aayusin yung inputs
+	#addi	%final, %final, 4	# To change if aayusin yung inputs
 	j	loop1
 false:	li	$v0, 0
 end_loop:	
@@ -308,7 +308,7 @@ end_i:
 	move	$t0, %pos
 	sll	$t0, $t0, 4
 	addi	$t1, $t0, 4
-	lw	$t3, 0(%piece)
+	move	$t3, %piece
 	add	$t3, $t3, $t0
 	li	$t2, -1
 	
@@ -324,11 +324,11 @@ block_is_greater:
 	j	loop
 end:
 	move	$v0, $t2
-	sw	$t0, 24($sp)
-	sw	$t1, 20($sp)
-	sw	$t2, 16($sp)
-	sw	$t3, 12($sp)
-	sw	$t4, 8($sp)	
+	lw	$t0, 24($sp)
+	lw	$t1, 20($sp)
+	lw	$t2, 16($sp)
+	lw	$t3, 12($sp)
+	lw	$t4, 8($sp)	
 	addi	$sp, $sp, 32
 .end_macro 
 
@@ -399,110 +399,22 @@ end:
 	addi	$sp, $sp, 32
 .end_macro 
 
-# USED TEMP VARS: T1-T3
-.macro backtrack(%currGrid, %chosen, %pieces, %len)
-# REMOVE FROM MACRO
-	addi	$sp, $sp, 32
-	sw	$s0, 28($sp)
-	sw	$s1, 24($sp)
-	sw	$s2, 20($sp)
-	sw	$s3, 16($sp)
-	sw	$s4, 12($sp)
-	sw	$s5, 8($sp)
-	sw	$ra, 4($sp)
-	
-	move	$s0, %currGrid
-	la	$s1, final_grid
-	move	$s2, %len
-	move	$s3, %chosen
-	move	$s4, %pieces
-	
-		
-	is_equal_grids($s0, $s1)
-	bnez	$v0, return_true
-	
-else:
-	deepcopy($s3, 2)
-	move	$s5, $v0	# chosen_copy = chosen[:]
-	
-	li	$t1, 0		# initialize i
-loop_i:
-	beq	$t1, $s2, end
-	lb	$t2, 0($s3)		# chosen[i]
-	xori	$t2, $t2, 1
-	beqz	$t2, loop_back_to_i	# if not chosen[i]:
-	
-	get_max_x_of_piece($s4, $t1)	# get_max_x_of_piece(pieces[i])
-	move	$t3, $v0		#  max_x_of_piece
-
-	#  for offset in range(6 - max_x_of_piece):
-	li	$t5, 6
-	sub	$t3, $t5, $t3	 	# range(6 - max_x_of_piece)
-	li	$t5, 0
-	
-loop_offset:
-	beq	$t5, $t3, loop_back_to_i
-	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
-	# ASSUMPTION $v0 = nextGrid & $v1 = success
-	
-	subi	$sp, $sp, 4
-	sw	$t1, 0($sp)
-	sll	$t1, $t1, 4
-	add	$t1, $t1, $s4
-	
-	drop_piece_in_grid($s0, $t1, $t5)
-	
-	bnez	$v1, loop_back_to_offset	# if success:
-	li	$t0, 1
-	sb	$t0, 0($s5)	# chosen_copy[i] = True
-	
-	lw	$t1, 0($sp)
-	addi	$sp, $sp, 4
-	
-	move	$a0, $v0
-	move	$a1, $s5
-	move	$a2, $s4
-	backtrack($a0, $a1, $a2, $s2)	# PROBLEM HERE !!!
-	move	$t6, $v0	# backtrack(nextGrid, chosen_copy, pieces)
-	bnez	$t6, return_true
-	
-	li	$t0, 0
-	sb	$t0, 0($s5)	# chosen_copy[i] = False
-	
-loop_back_to_offset:
-	addi	$t5, $t5, 1
-	j	loop_offset
-	
-loop_back_to_i:
-	addi	$t1, $t1, 1
-	addi	$s3, $s3, 1
-	addi	$s5, $s5, 1
-	j	loop_i
-
-return_false:
-	li	$v0, 0
-	j	end
-	
-return_true:
-	li	$v0, 1
-end:
-	lw	$s0, 28($sp)
-	lw	$s1, 24($sp)
-	lw	$s2, 20($sp)
-	lw	$s3, 16($sp)
-	lw	$s4, 12($sp)
-	lw	$s5, 8($sp)
-	lw	$ra, 4($sp)
-	subi	$sp, $sp, 32
-.end_macro 
-
 .macro drop_piece_in_grid(%grid, %piece, %offset)
 	# OFFLIMIT REGISTERS
-	subi	$sp, $sp, 32
-	sw	$s5, 28($sp)
-	sw	$s6, 24($sp)
-	sw	$s7, 20($sp)
-	sw	$t0, 16($sp)
+	subi	$sp, $sp, 64
+	sw	$s5, 60($sp)
+	sw	$s6, 56($sp)
+	sw	$s7, 52($sp)
+	sw	$t0, 48($sp)
+	sw	$t1, 44($sp)
+	sw	$t2, 40($sp)
+	sw	$t3, 36($sp)
+	sw	$t4, 32($sp)
+	sw	$t5, 28($sp)
+	sw	$t6, 24($sp)
+	sw	$t7, 20($sp)
+	sw	$t8, 16($sp)
+	sw	$t9, 12($sp)
 	
 	move	$s5, %grid
 	move	$s6, %piece
@@ -704,11 +616,20 @@ ret_grid_F:
 	move	$v0, $s5
 	li	$v1, 0x0
 end_of_piece_drop:
-	lw	$s5, 28($sp)
-	lw	$s6, 24($sp)
-	lw	$s7, 20($sp)
-	lw	$t0, 16($sp)
-	addi	$sp, $sp, 32
+	lw	$s5, 60($sp)
+	lw	$s6, 56($sp)
+	lw	$s7, 52($sp)
+	lw	$t0, 48($sp)
+	lw	$t1, 44($sp)
+	lw	$t2, 40($sp)
+	lw	$t3, 36($sp)
+	lw	$t4, 32($sp)
+	lw	$t5, 28($sp)
+	lw	$t6, 24($sp)
+	lw	$t7, 20($sp)
+	lw	$t8, 16($sp)
+	lw	$t9, 12($sp)
+	addi	$sp, $sp, 64
 .end_macro 
 
 .macro print(%add)
@@ -796,13 +717,6 @@ loop:
 
 	#move	$s5, $v0
 	
-	##### DROP PIECE IN GRID #####
-	move	$a0, $s0	# grid
-	move	$a1, $s4	# piece
-	li	$a2, 2		# offset (hard coded for now)
-
-	
-	
 	##### TESTING #####
 	#move	$t0, $v0
 	#print($t0)
@@ -811,6 +725,182 @@ loop:
 	#move	$a0, $t0
 	#syscall
 	
+	
+	##### DROP PIECE IN GRID #####
+	move	$a0, $s0		# grid
+	move	$a1, $s3		# chosen
+	move	$a2, $s4		# pieces
+	
+	jal	backtrack
+	j	end_program
+backtrack:
+	# REMOVE FROM MACRO
+	subi	$sp, $sp, 64
+	sw	$s0, 60($sp)
+	sw	$s3, 56($sp)
+	sw	$s4, 52($sp)
+	sw	$t0, 48($sp)
+	sw	$t1, 44($sp)
+	sw	$t2, 40($sp)
+	sw	$t3, 36($sp)
+	sw	$t4, 32($sp)
+	sw	$t5, 28($sp)
+	sw	$t6, 24($sp)
+	sw	$t7, 20($sp)
+	sw	$t8, 16($sp)
+	sw	$t9, 12($sp)
+	sw	$s5, 8($sp)
+	sw	$ra, 4($sp)
+	sw	$v0, 0($sp)
+	
+	move	$s0, $a0
+	move	$s3, $a1
+	move	$s4, $a2
+		
+	is_equal_grids($s0, $s1)
+	
+	##### DELETE THIS ######
+	subi	$sp, $sp, 12
+	sw	$v0, 8($sp)
+	sw	$a0, 4($sp)
+	sw	$t9, 0($sp)
+	
+	move	$t9, $v0
+	li	$v0, 1
+	move	$a0, $t9
+	syscall
+	
+	lw	$v0, 8($sp)
+	lw	$a0, 4($sp)
+	lw	$t9, 0($sp)
+	addi	$sp, $sp, 12
+	##### DELETE THIS ######
+	
+	bnez	$v0, return_true
+	
+else:
+	deepcopy($s3, 2)
+	move	$s5, $v0	# chosen_copy = chosen[:]
+	subi	$s5, $s5, 8
+	
+	li	$t1, 0		# initialize i
+loop_i:
+	beq	$t1, $s2, return_false	
+	lb	$t2, 0($s3)		# chosen[i]
+	bnez	$t2, loop_back_to_i
+	
+	get_max_x_of_piece($s4, $t1)	# get_max_x_of_piece(pieces[i])
+	move	$t3, $v0		#  max_x_of_piece
+	
+	#  for offset in range(6 - max_x_of_piece):
+	li	$t5, 6
+	sub	$t3, $t5, $t3	 	# range(6 - max_x_of_piece)
+	li	$t5, 0			# offset
+
+loop_offset:
+	beq	$t5, $t3, loop_back_to_i
+	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
+	# ASSUMPTION $v0 = nextGrid & $v1 = success
+	
+	subi	$sp, $sp, 4
+	sw	$t1, 0($sp)
+	sll	$t1, $t1, 4
+	add	$t1, $t1, $s4
+	
+	##### DELETE THIS ######
+	subi	$sp, $sp, 8
+	sw	$v0, 4($sp)
+	sw	$a0, 0($sp)
+	li	$v0, 1
+	move	$a0, $t1
+	syscall
+	lw	$v0, 4($sp)
+	lw	$a0, 0($sp)
+	addi	$sp, $sp, 8
+	##### DELETE THIS ######
+	
+	drop_piece_in_grid($s0, $t1, $t5)
+	
+	##### DELETE THIS ######
+	subi	$sp, $sp, 8
+	sw	$v0, 4($sp)
+	sw	$a0, 0($sp)
+	li	$v0, 4
+	la	$a0, newline
+	syscall
+	lw	$v0, 4($sp)
+	lw	$a0, 0($sp)
+	addi	$sp, $sp, 8
+	##### DELETE THIS ######
+	
+	lw	$t1, 0($sp)
+	addi	$sp, $sp, 4
+	
+	beqz	$v1, loop_back_to_offset	# if success:
+	li	$t0, 1
+	sb	$t0, 0($s5)			# chosen_copy[i] = True	
+	
+	move	$a0, $v0			# nextGrid
+	move	$a1, $s5
+	move	$a2, $s4
+	jal	backtrack			# backtrack(nextGrid, chosen_copy, pieces)
+	
+	move	$t6, $v0	
+	bnez	$t6, return_true
+	
+	li	$t0, 0
+	sb	$t0, 0($s5)	# chosen_copy[i] = False
+	
+loop_back_to_offset:
+	addi	$t5, $t5, 1	# offset++
+	j	loop_offset
+	
+loop_back_to_i:
+	addi	$t1, $t1, 1	# i++
+	addi	$s3, $s3, 1	# chosen+++
+	addi	$s5, $s5, 1	# chosen_copy+++
+	j	loop_i
+	
+return_false:
+	li	$v0, 0
+	j	end
+	
+return_true:
+	li	$v0, 1
+end:
+	lw	$s0, 60($sp)
+	lw	$s3, 56($sp)
+	lw	$s4, 52($sp)
+	lw	$t0, 48($sp)
+	lw	$t1, 44($sp)
+	lw	$t2, 40($sp)
+	lw	$t3, 36($sp)
+	lw	$t4, 32($sp)
+	lw	$t5, 28($sp)
+	lw	$t6, 24($sp)
+	lw	$t7, 20($sp)
+	lw	$t8, 16($sp)
+	lw	$t9, 12($sp)
+	lw	$s5, 8($sp)
+	lw	$ra, 4($sp)
+	lw	$v0, 0($sp)
+	addi	$sp, $sp, 64
+	jr	$ra
+	
+end_program:
+	move	$t0, $v0
+	beqz	$t0, print_no
+	li	$v0, 4
+	la	$a0, yes
+	syscall
+	j	stop_program
+
+print_no:
+	li	$v0, 4
+	la	$a0, no
+	syscall
+
+stop_program:
     	li $v0, 10             # exit program
     	syscall
 
@@ -829,5 +919,5 @@ deep_chosen:	.space 24
 filename:	.asciiz "test.in"
 
 newline:	.asciiz "\n\n"
-yes:		.asciiz "\nYes"
-no:		.asciiz "\nNo"
+yes:		.asciiz "YES"
+no:		.asciiz "NO"
