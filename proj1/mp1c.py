@@ -9,9 +9,9 @@ def is_equal_grids(gridOne, gridTwo):
     return result
 
 
-# def print_grid(grid):
-#     for row in grid:
-#         print(''.join(row))
+def print_grid(grid):
+    for row in grid:
+        print(''.join(row))
 
 ### DONE ###
 def freeze_blocks(grid):
@@ -28,7 +28,7 @@ def get_max_x_of_piece(piece):
     for block in piece:
         max_x = max(max_x, block[1])
         # print(block)
-    print(max_x)
+    # print(max_x)
     return max_x
 
 
@@ -102,6 +102,7 @@ def backtrack(currGrid, chosen, pieces):
                 # for k in range(len(nextGrid)):
                 #     print(nextGrid[k])
                 # print()
+                print(success)
                 if success:
                     chosen_copy[i] = True
                     if backtrack(nextGrid, chosen_copy, pieces):
@@ -109,6 +110,23 @@ def backtrack(currGrid, chosen, pieces):
                     chosen_copy[i] = False
     return False
 
+"""
+s0 : currGrid           (array of array)
+s1 : finalGrid          (array of array)
+s2 : number of pieces   (int)
+s3 : chosen             (array of boolean)
+s4 : pieces             (array of array of tuple)
+s5 : deep_chosen        (copy of chosen)
+"""
+
+"""
+nextGrid = s0
+chosen_copy = s5
+pieces = s4
+i = t1
+offset = t5
+chosen = s3
+"""
 
 # initialize grids to have 4 empty rows
 ### DONE ###

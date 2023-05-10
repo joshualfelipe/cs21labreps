@@ -209,34 +209,29 @@ end_loop:
 	sw	$t2, 20($sp)
 	sw	$t3, 16($sp)
 	sw	$t4, 12($sp)
-	sw	$t5, 8($sp)
-	sw	$t6, 4($sp)
 	
-	li	$t0, 0
-	li	$t2, 20
-	li	$v0, 0x1
-loop1:
-	beq	$t0, $t2, end_loop	# for i in range(6 + 4):
-	lw	$t4, 0(%start)
-	lw	$t5, 0(%final)
-	bne	$t4, $t5, false		# (gridOne[i][j] == gridTwo[i][j])
-	addi	%start, %start, 4
-	addi	%final, %final, 4
-end_loop2:
-	addi	$t0, $t0, 1
-	#addi	%start, %start, 4	# To change if aayusin yung inputs
-	#addi	%final, %final, 4	# To change if aayusin yung inputs
-	j	loop1
+	move	$t0, %start
+	move	$t1, %final
+
+	li	$t2, 0
+	li	$v0, 1
+	
+loop:
+	beq	$t2, 20, end_loop
+	lw	$t3, 0($t0)
+	lw	$t4, 0($t1)
+	bne	$t3, $t4, false
+	addi	$t0, $t0, 4
+	addi	$t1, $t1, 4
+	addi	$t2, $t2, 1
+	j	loop
 false:	li	$v0, 0
-end_loop:	
-	# return result
+end_loop:
 	lw	$t0, 28($sp)
 	lw	$t1, 24($sp)
 	lw	$t2, 20($sp)
 	lw	$t3, 16($sp)
 	lw	$t4, 12($sp)
-	lw	$t5, 8($sp)
-	lw	$t6, 4($sp)
 	addi	$sp, $sp, 32
 .end_macro 
 
@@ -460,6 +455,7 @@ loop_block:
 	
 	# DO NOT TOUCH REGISTERS: T0, T1, T2, T3
 loop_forever:
+  	
 	li	$t1, 0x1	# canStillGoDown
 	li	$t2, 0		# initialize i
 
@@ -555,23 +551,29 @@ loop_down_j:
 	li	$t7, 0x23
 	sb	$t7, 0($t6)
 	
-skip:
-	#move	$t7, $a0
-	#print($t0)
-	#la	$a0, newline
- 	#li 	$v0, 4
-  	#syscall
-  	#move	$a0, $t7
-  	
+skip: 	
 	lw	$t0, 0($sp)
 	addi	$sp, $sp, 4
 	addi	$t2, $t2, 1
 	bne	$t2, 6, loop_down_j
 	subi	$t8, $t8, 1
-	bnez	$t8, loop_down_i
+	bne	$t8, -1, loop_down_i
+	
+	
+  	
 	j	loop_forever
 	
 end_loop_forever:
+	##### DELETE THIS ######
+	move	$t7, $a0
+	print($t0)
+	la	$a0, newline
+ 	li 	$v0, 4
+  	syscall
+  	move	$a0, $t7
+  	##### DELETE THIS ######
+
+
 	# for i in range(4 + 6):
 	
 	li	$t1, 9		# maxY
@@ -651,12 +653,44 @@ loop:
 	addi	$t3, $t3, 1	
 	blt	$t1, 80, loop
 	
+	la	$a0, newline
+ 	li 	$v0, 4
+  	syscall
+	
 	lw	$t1, 0($sp)
 	lw	$t2, 4($sp)
 	lw	$t3, 8($sp)
 	addi	$sp, $sp, 32
 .end_macro
 
+.macro print_chosen(%add)
+	subi	$sp, $sp, 32
+	sw	$t1, 0($sp)
+	sw	$t2, 4($sp)
+	sw	$t3, 8($sp)
+	
+	li	$t1, 0
+	move	$t3, %add
+loop:
+	lb	$t2, 0($t3)
+	
+	move	$a0, $t2
+ 	li 	$v0, 1
+  	syscall
+  	
+	addi	$t1, $t1, 1
+	addi	$t3, $t3, 2	
+	blt	$t1, 6, loop
+	
+	la	$a0, newline
+ 	li 	$v0, 4
+  	syscall
+	
+	lw	$t1, 0($sp)
+	lw	$t2, 4($sp)
+	lw	$t3, 8($sp)
+	addi	$sp, $sp, 32
+.end_macro
 ###### DO NOT MODIFY THESE REGISTERS ######
 # S0 base address of start grid
 # S1 base address of final grid
@@ -711,6 +745,8 @@ loop:
 	#deepcopy($s1, 10)
 	#deepcopy($s3, 2)
 	#drop_piece_in_grid($a0, $a1, $a2)
+	#move	$a1, $s4		# chosen
+	#li	$a2, 4			# pieces
 	#move $t0, $v0
 	##### BACKTRACK #####
 	#backtrack($s0, $s3, $s4, $s2)
@@ -725,7 +761,6 @@ loop:
 	#move	$a0, $t0
 	#syscall
 	
-	
 	##### DROP PIECE IN GRID #####
 	move	$a0, $s0		# grid
 	move	$a1, $s3		# chosen
@@ -733,60 +768,42 @@ loop:
 	
 	jal	backtrack
 	j	end_program
-backtrack:
+	
+	#drop_piece_in_grid($a0, $a1, $a2)
+backtrack:	
 	# REMOVE FROM MACRO
-	subi	$sp, $sp, 64
-	sw	$s0, 60($sp)
-	sw	$s3, 56($sp)
-	sw	$s4, 52($sp)
-	sw	$t0, 48($sp)
-	sw	$t1, 44($sp)
-	sw	$t2, 40($sp)
-	sw	$t3, 36($sp)
-	sw	$t4, 32($sp)
-	sw	$t5, 28($sp)
-	sw	$t6, 24($sp)
-	sw	$t7, 20($sp)
-	sw	$t8, 16($sp)
-	sw	$t9, 12($sp)
-	sw	$s5, 8($sp)
+	subi	$sp, $sp, 32
+	sw	$s0, 28($sp)	# currGrid
+	sw	$s3, 24($sp)	# chosen
+	sw	$s4, 20($sp)	# pieces	
+	sw	$t1, 16($sp)	# i
+	sw	$t5, 12($sp)	# offset
+	sw	$s5, 8($sp)	# chosen_copy
 	sw	$ra, 4($sp)
-	sw	$v0, 0($sp)
 	
-	move	$s0, $a0
-	move	$s3, $a1
-	move	$s4, $a2
-		
+	move	$s0, $a0	# address of currGrid -> nextGrid	($s0)
+	move	$s3, $a1	# address of chosen -> chosen_copy	($s5)
+	move	$s4, $a2	# address of pieces -> pieces		($s4)
+	
+	
+	##### DELETE THIS ######
+	#print($s0)
+	#print($s1)
+	##### DELETE THIS ######
+	
 	is_equal_grids($s0, $s1)
-	
-	##### DELETE THIS ######
-	subi	$sp, $sp, 12
-	sw	$v0, 8($sp)
-	sw	$a0, 4($sp)
-	sw	$t9, 0($sp)
-	
-	move	$t9, $v0
-	li	$v0, 1
-	move	$a0, $t9
-	syscall
-	
-	lw	$v0, 8($sp)
-	lw	$a0, 4($sp)
-	lw	$t9, 0($sp)
-	addi	$sp, $sp, 12
-	##### DELETE THIS ######
-	
-	bnez	$v0, return_true
-	
+
+	bnez	$v0, end
 else:
 	deepcopy($s3, 2)
 	move	$s5, $v0	# chosen_copy = chosen[:]
 	subi	$s5, $s5, 8
 	
 	li	$t1, 0		# initialize i
+	move	$s6, $s3
+	move	$s7, $s5
 loop_i:
-	beq	$t1, $s2, return_false	
-	lb	$t2, 0($s3)		# chosen[i]
+	lb	$t2, 0($s6)		# chosen[i]
 	bnez	$t2, loop_back_to_i
 	
 	get_max_x_of_piece($s4, $t1)	# get_max_x_of_piece(pieces[i])
@@ -798,7 +815,6 @@ loop_i:
 	li	$t5, 0			# offset
 
 loop_offset:
-	beq	$t5, $t3, loop_back_to_i
 	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
 	# ASSUMPTION $v0 = nextGrid & $v1 = success
 	
@@ -806,85 +822,47 @@ loop_offset:
 	sw	$t1, 0($sp)
 	sll	$t1, $t1, 4
 	add	$t1, $t1, $s4
-	
-	##### DELETE THIS ######
-	subi	$sp, $sp, 8
-	sw	$v0, 4($sp)
-	sw	$a0, 0($sp)
-	li	$v0, 1
-	move	$a0, $t1
-	syscall
-	lw	$v0, 4($sp)
-	lw	$a0, 0($sp)
-	addi	$sp, $sp, 8
-	##### DELETE THIS ######
-	
+		
 	drop_piece_in_grid($s0, $t1, $t5)
-	
-	##### DELETE THIS ######
-	subi	$sp, $sp, 8
-	sw	$v0, 4($sp)
-	sw	$a0, 0($sp)
-	li	$v0, 4
-	la	$a0, newline
-	syscall
-	lw	$v0, 4($sp)
-	lw	$a0, 0($sp)
-	addi	$sp, $sp, 8
-	##### DELETE THIS ######
 	
 	lw	$t1, 0($sp)
 	addi	$sp, $sp, 4
 	
 	beqz	$v1, loop_back_to_offset	# if success:
 	li	$t0, 1
-	sb	$t0, 0($s5)			# chosen_copy[i] = True	
-	
+	sb	$t0, 0($s7)			# chosen_copy[i] = True	
+
 	move	$a0, $v0			# nextGrid
-	move	$a1, $s5
-	move	$a2, $s4
+	move	$a1, $s5			# chosen_copy
+	move	$a2, $s4			# pieces
 	jal	backtrack			# backtrack(nextGrid, chosen_copy, pieces)
 	
-	move	$t6, $v0	
-	bnez	$t6, return_true
-	
+	bnez	$v0, end	
 	li	$t0, 0
-	sb	$t0, 0($s5)	# chosen_copy[i] = False
+	sb	$t0, 0($s7)			# chosen_copy[i] = False
 	
 loop_back_to_offset:
-	addi	$t5, $t5, 1	# offset++
-	j	loop_offset
+	addi	$t5, $t5, 1			# offset++
+	blt	$t5, $t3, loop_offset
 	
 loop_back_to_i:
-	addi	$t1, $t1, 1	# i++
-	addi	$s3, $s3, 1	# chosen+++
-	addi	$s5, $s5, 1	# chosen_copy+++
-	j	loop_i
+	addi	$t1, $t1, 1			# i++
+	add	$s6, $s3, $t1			# chosen++
+	add	$s7, $s5, $t1			# chosen_copy++
+	blt	$t1, $s2, loop_i	
 	
 return_false:
 	li	$v0, 0
-	j	end
 	
-return_true:
-	li	$v0, 1
 end:
-	lw	$s0, 60($sp)
-	lw	$s3, 56($sp)
-	lw	$s4, 52($sp)
-	lw	$t0, 48($sp)
-	lw	$t1, 44($sp)
-	lw	$t2, 40($sp)
-	lw	$t3, 36($sp)
-	lw	$t4, 32($sp)
-	lw	$t5, 28($sp)
-	lw	$t6, 24($sp)
-	lw	$t7, 20($sp)
-	lw	$t8, 16($sp)
-	lw	$t9, 12($sp)
-	lw	$s5, 8($sp)
+	lw	$s0, 28($sp)	# currGrid
+	lw	$s3, 24($sp)	# chosen
+	lw	$s4, 20($sp)	# pieces	
+	lw	$t1, 16($sp)	# i
+	lw	$t5, 12($sp)	# offset
+	lw	$s5, 8($sp)	# chosen_copy
 	lw	$ra, 4($sp)
-	lw	$v0, 0($sp)
-	addi	$sp, $sp, 64
+	addi	$sp, $sp, 32
 	jr	$ra
 	
 end_program:
