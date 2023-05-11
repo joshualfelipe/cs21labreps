@@ -235,6 +235,41 @@ end_loop:
 	addi	$sp, $sp, 32
 .end_macro 
 
+.macro not_fit(%start, %final)
+	subi	$sp, $sp, 32
+	sw	$t0, 28($sp)
+	sw	$t1, 24($sp)
+	sw	$t2, 20($sp)
+	sw	$t3, 16($sp)
+	sw	$t4, 12($sp)
+	
+	move	$t0, %start
+	move	$t1, %final
+
+	li	$t2, 0
+	li	$v0, 0
+	
+loop:
+	beq	$t2, 80, end_loop
+	lb	$t3, 0($t0)
+	bne	$t3, 'X', go_back
+	lb	$t4, 0($t1)
+	bne	$t4, 'X', true
+go_back:
+	addi	$t0, $t0, 1
+	addi	$t1, $t1, 1
+	addi	$t2, $t2, 1
+	j	loop
+true:	li	$v0, 1
+end_loop:
+	lw	$t0, 28($sp)
+	lw	$t1, 24($sp)
+	lw	$t2, 20($sp)
+	lw	$t3, 16($sp)
+	lw	$t4, 12($sp)
+	addi	$sp, $sp, 32
+.end_macro 
+
 .macro convert_pieces_to_pairs(%arr, %inc)
 	subi	$sp, $sp, 32
 	sw	$s0, 28($sp)
@@ -455,6 +490,8 @@ loop_block:
 	
 	# DO NOT TOUCH REGISTERS: T0, T1, T2, T3
 loop_forever:
+
+
   	
 	li	$t1, 0x1	# canStillGoDown
 	li	$t2, 0		# initialize i
@@ -564,16 +601,6 @@ skip:
 	j	loop_forever
 	
 end_loop_forever:
-	##### DELETE THIS ######
-	move	$t7, $a0
-	print($t0)
-	la	$a0, newline
- 	li 	$v0, 4
-  	syscall
-  	move	$a0, $t7
-  	##### DELETE THIS ######
-
-
 	# for i in range(4 + 6):
 	
 	li	$t1, 9		# maxY
@@ -766,6 +793,7 @@ loop:
 	move	$a1, $s3		# chosen
 	move	$a2, $s4		# pieces
 	
+	#subi	$s2, $s2, 1
 	jal	backtrack
 	j	end_program
 	
@@ -780,6 +808,7 @@ backtrack:
 	sw	$t5, 12($sp)	# offset
 	sw	$s5, 8($sp)	# chosen_copy
 	sw	$ra, 4($sp)
+	sw	$t3, 0($sp)	# max_x_piece
 	
 	move	$s0, $a0	# address of currGrid -> nextGrid	($s0)
 	move	$s3, $a1	# address of chosen -> chosen_copy	($s5)
@@ -791,8 +820,10 @@ backtrack:
 	#print($s1)
 	##### DELETE THIS ######
 	
+	not_fit($s0, $s1)
+	beq	$v0, 1, return_false
+	
 	is_equal_grids($s0, $s1)
-
 	bnez	$v0, end
 else:
 	deepcopy($s3, 2)
@@ -839,6 +870,7 @@ loop_offset:
 	
 	bnez	$v0, end	
 	li	$t0, 0
+	add	$s7, $s5, $t1
 	sb	$t0, 0($s7)			# chosen_copy[i] = False
 	
 loop_back_to_offset:
@@ -862,6 +894,7 @@ end:
 	lw	$t5, 12($sp)	# offset
 	lw	$s5, 8($sp)	# chosen_copy
 	lw	$ra, 4($sp)
+	lw	$t3, 0($sp)	# max_x_piece
 	addi	$sp, $sp, 32
 	jr	$ra
 	

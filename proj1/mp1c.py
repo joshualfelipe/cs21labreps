@@ -1,6 +1,6 @@
 from copy import deepcopy
+import time
 
-### DONE ###
 def is_equal_grids(gridOne, gridTwo):
     result = True
     for i in range(6 + 4):
@@ -9,11 +9,19 @@ def is_equal_grids(gridOne, gridTwo):
     return result
 
 
+def not_fit(gridOne, gridTwo):
+    # result = False
+    for i in range(6 + 4): 
+        for j in range(6):
+            if (gridOne[i][j] == 'X' and gridTwo[i][j] != 'X'):
+                return True
+    return False
+
 def print_grid(grid):
     for row in grid:
         print(''.join(row))
 
-### DONE ###
+
 def freeze_blocks(grid):
     for i in range(6 + 4):
         for j in range(6):
@@ -22,38 +30,26 @@ def freeze_blocks(grid):
     return grid
 
 
-### DONE ###
 def get_max_x_of_piece(piece):
     max_x = -1
     for block in piece:
         max_x = max(max_x, block[1])
-        # print(block)
-    # print(max_x)
     return max_x
 
 
 def drop_piece_in_grid(grid, piece, yOffset):
-    gridCopy = [[grid[i][j] for j in range(6)] for i in range(4 + 6)]
-    maxY = 9
+    gridCopy = deepcopy(grid)
+    maxY = 100
     for block in piece:
         gridCopy[block[0]][block[1] + yOffset] = '#'  # put piece in grid
-        print(block)
     #  only active blocks are '#'; frozen blocks are 'X'
-
-    # for k in range(len(gridCopy)):
-    #     print(gridCopy[k])
-    # print()
-
     while True:
         canStillGoDown = True
         for i in range(4 + 6):
             for j in range(6):
                 if gridCopy[i][j] == '#' and (i + 1 == 10 or gridCopy[i + 1][j] == 'X'):
                     canStillGoDown = False
-                    break  # terminate inner loop as soon as we find a cell that cannot move down
-            if not canStillGoDown:
-                break  # terminate outer loop if we can't move any cells down
-
+        
         if canStillGoDown:
             for i in range(8, -1, -1):  # move cells of piece down, starting from bottom cells
                 for j in range(6):
@@ -62,8 +58,6 @@ def drop_piece_in_grid(grid, piece, yOffset):
                         gridCopy[i][j] = '.'
         else:
             break
-    for i in range(10):
-        print(gridCopy[i])
     
     for i in range(4 + 6):
         for j in range(6):
@@ -75,8 +69,6 @@ def drop_piece_in_grid(grid, piece, yOffset):
     else:
         return freeze_blocks(gridCopy), True
 
-
-### DONE ###
 def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top left of grid
     pieceCoords = []
     for i in range(4):
@@ -85,58 +77,37 @@ def convert_piece_to_pairs(pieceGrid):  # get (row,col) coords of piece at top l
                 pieceCoords.append([i, j])
     return pieceCoords
 
-
 def backtrack(currGrid, chosen, pieces):
     # print(chosen)
     # print_grid(currGrid)
     # print()
+    result = False
+    if not_fit(currGrid, final_grid):
+        return False
     if is_equal_grids(currGrid, final_grid):
         return True
-    chosen_copy = chosen[:]
     for i in range(len(chosen)):
         if not chosen[i]:
             max_x_of_piece = get_max_x_of_piece(pieces[i])
+            chosenCopy = deepcopy(chosen)  # copy of chosen
             for offset in range(6 - max_x_of_piece):
                 nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
-                # print(len(nextGrid))
-                # for k in range(len(nextGrid)):
-                #     print(nextGrid[k])
-                # print()
-                print(success)
                 if success:
-                    chosen_copy[i] = True
-                    if backtrack(nextGrid, chosen_copy, pieces):
+                    chosenCopy[i] = True
+                    result = result or backtrack(nextGrid, chosenCopy, pieces)
+                    if result:
                         return True
-                    chosen_copy[i] = False
-    return False
-
-"""
-s0 : currGrid           (array of array)
-s1 : finalGrid          (array of array)
-s2 : number of pieces   (int)
-s3 : chosen             (array of boolean)
-s4 : pieces             (array of array of tuple)
-s5 : deep_chosen        (copy of chosen)
-"""
-
-"""
-nextGrid = s0
-chosen_copy = s5
-pieces = s4
-i = t1
-offset = t5
-chosen = s3
-"""
+    return result
 
 # initialize grids to have 4 empty rows
-### DONE ###
+
 start_grid = [['.' for _ in range(6)] for _ in range(4)]
 final_grid = [['.' for _ in range(6)] for _ in range(4)]
 
 # grids will be 10 rows by 6 columns, so we can put the piece at the top,
 # before letting it fall
 
-for _ in range(6): ### DONE ###
+for _ in range(6):
     line = input()
     row = [character for character in line]
     for j in range(len(row)):
@@ -144,7 +115,7 @@ for _ in range(6): ### DONE ###
             row[j] = 'X'  # mark frozen blocks as 'X'
     start_grid.append(row)
 
-for _ in range(6): ### DONE ###
+for _ in range(6):
     line = input()
     row = [character for character in line]
     for j in range(len(row)):
@@ -152,22 +123,25 @@ for _ in range(6): ### DONE ###
             row[j] = 'X'   # mark frozen blocks as 'X'
     final_grid.append(row)
 
-numPieces = int(input()) ### DONE ###
-chosen = [False for _ in range(numPieces)] ### DONE ### # tracks which piece has been used
-converted_pieces = [] ### DONE ###
-for _ in range(numPieces):### DONE ###
+numPieces = int(input())
+chosen = [False for _ in range(numPieces)]  # tracks which piece has been used
+converted_pieces = []
+for _ in range(numPieces):
     pieceAscii = []
     for _ in range(4):
         line = input()
         row = [character for character in line]
         pieceAscii.append(row)
     piecePairs = convert_piece_to_pairs(pieceAscii)
-    # print(piecePairs)
     converted_pieces.append(piecePairs)
 
 
+start = time.time()
 answer = backtrack(start_grid, chosen, converted_pieces)
 if answer:
     print('YES')
 else:
     print('NO')
+
+end = time.time()
+print(end - start)
