@@ -39,7 +39,7 @@ def get_max_x_of_piece(piece):
 
 def drop_piece_in_grid(grid, piece, yOffset):
     gridCopy = deepcopy(grid)
-    maxY = 100
+    maxY = 9
     for block in piece:
         gridCopy[block[0]][block[1] + yOffset] = '#'  # put piece in grid
     #  only active blocks are '#'; frozen blocks are 'X'
