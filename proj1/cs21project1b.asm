@@ -8,9 +8,8 @@
 .macro	read_file(%bytes, %add)
 	# THIS MACRO READS THE FILE INPUTS 
 	# AND RETURNS THE BASE ADDRESS
-	
-	lw	$a0, 0($gp)			# load file descriptor saved in global memory, remove for stdin
-	#li	$a0, 0				# file descriptor for stdin, uncomment for stdin
+
+	li	$a0, 0				# file descriptor for stdin, uncomment for stdin
 	move	$a1, %add			# buffer address
 	addi	$a2, $0 %bytes			# number of bytes to take
 	
@@ -442,11 +441,10 @@ end:
 	
 	li	$t4, %len
 	move	$t1, %arr
-	beq	$t4, 96, deep_copy_grid		# If 10, deepcopy grid. Else, deepcopy chosen
+	beq	$t4, 0xa, deep_copy_grid	# If 10, deepcopy grid. Else, deepcopy chosen
 	j	deep_copy_chosen
 	
 deep_copy_grid:
-	#subi	$sp, $sp, 96
 	# DEEPCOPY A GRID
 	li	$t0, 96				# allocate 24 bytes for the copy
 	li 	$v0, 9  			# system call for memory allocation
@@ -466,7 +464,6 @@ grid_copy_loop:
 	j	end_grid
 	
 deep_copy_chosen:
-	#subi	$sp, $sp, 8
 	# DEEPCOPY CHOSEN
 	li	$t0, 8				# allocate 8 bytes for the copy
 	li 	$v0, 9  			# system call for memory allocation
@@ -811,11 +808,10 @@ loop:
 .end_macro
 
 .macro counter(%add)
-	# ACTS AS VOID INIT_ARR(ADDRESS):
-	# THIS MACRO INITIALIZES AN ARRAY OF 4 ROWS WITH 6 COLUMNS
-	# IMPLEMENTATION: 4 ROWS, 8 COLUMNS TO CONSIDER THE \n\r VALUES
-	# ONCE INPUTS ARE ADDED TO GRIDS.
-	# THIS UPDATES THE ADDRESS VALUE OF %P
+	# THIS FUNCTION COUNTS THE NUMBER OF PIECES BEING USED IN THE GRID
+	# IT RETURNS AN INT ON THE NUMBER OF 'X'
+	# THIS WILL HELP IN DETERMINING IF THE FINAL GRID IS POSSIBLE GIVEN
+	# A SPECIFIC NUMBER OF PIECES AND NUMBER OF 'X' IN CURRENT GRID
 	
 	subi	$sp, $sp, 32
 	sw	$t0, 28($sp)
@@ -857,15 +853,6 @@ main:
 	# S4 base address of pieces
 	###### DO NOT MODIFY THESE REGISTERS ######
 	
-	# remove this whole block for stdin, no setup is required in that case, only the read_file macro
-	la	$a0, filename	# opens the file based on filename in .data directive
-	li	$a1, 0
-	li	$a2, 0
-	li	$v0, 13	# open file
-	syscall
-	sw	$v0, 0($gp)	# save the file descriptor as a global variable
-	# remove until here for stdin
-	
 	# Initialize grids to have 4 empty rows and 6 columns
 	la	$s0, start_grid   		# $s0 = address of start_grid
 	la	$s1, final_grid   		# $s1 = address of final_grid
@@ -886,6 +873,7 @@ main:
 	subi	$s2, $s2, 0x30			# removes the extra
 	
 	##### CHECK IF NUM_PIECES ARE VALID #####
+	
 	subi	$sp, $sp, 32
 	sw	$t0, 28($sp)
 	sw	$t1, 24($sp)
@@ -958,12 +946,12 @@ else:
 	move	$s5, $v0			# chosen_copy = chosen[:]
 	subi	$s5, $s5, 8			# Subtracts 8 since for some reason it increments the final address by 8.
 	
-	li	$t1, 0				# initialize i
+	#li	$t1, 0				# initialize i
 	move	$s6, $s3			# created a copy of the address of chosen
 	move	$s7, $s5			# created a copy of the address of chosen_copy
 loop_i:
 	lb	$t2, 0($s6)			# chosen[i]
-	bnez	$t2, loop_back_to_i		# if not chosen[i]:
+	#bnez	$t2, loop_back_to_i		# if not chosen[i]:
 	
 	get_max_x_of_piece($s4, $t1)		# get_max_x_of_piece(pieces[i])
 	move	$t3, $v0			#  max_x_of_piece
@@ -1074,35 +1062,3 @@ no:		.asciiz "NO"
 # p + r * cols + c
 
 ##########################################################
-
-##### DELETE THIS #####
-filename:	.asciiz "test.in"
-newline:	.asciiz "\n\n"
-
-	##### WORKING FUCNTION CALLS #####
-	#li $t0, 0
-	#get_max_x_of_piece($s4, $t0)
-	#freeze_blocks($v0)
-	#is_equal_grids($s0, $s1)
-	#deepcopy($s1, 10)
-	#deepcopy($s3, 2)
-	#drop_piece_in_grid($a0, $a1, $a2)
-	#move	$a1, $s4		# chosen
-	#li	$a2, 4			# pieces
-	#move $t0, $v0
-	##### BACKTRACK #####
-	#backtrack($s0, $s3, $s4, $s2)
-
-	#move	$s5, $v0
-	
-	##### TESTING #####
-	#move	$t0, $v0
-	#print($t0)
-	#move	$t0, $v0
-	#li	$v0, 1
-	#move	$a0, $t0
-	#syscall
-	
-	##### DROP PIECE IN GRID #####
-	#drop_piece_in_grid($a0, $a1, $a2)
-##### DELETE THIS #####

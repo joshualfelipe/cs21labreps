@@ -10,7 +10,6 @@ def is_equal_grids(gridOne, gridTwo):
 
 
 def not_fit(gridOne, gridTwo):
-    # result = False
     for i in range(6 + 4): 
         for j in range(6):
             if (gridOne[i][j] == 'X' and gridTwo[i][j] != 'X'):
@@ -87,7 +86,7 @@ def backtrack(currGrid, chosen, pieces):
     if is_equal_grids(currGrid, final_grid):
         return True
     for i in range(len(chosen)):
-        if not chosen[i]:
+       if not chosen[i]:
             max_x_of_piece = get_max_x_of_piece(pieces[i])
             chosenCopy = deepcopy(chosen)  # copy of chosen
             for offset in range(6 - max_x_of_piece):
