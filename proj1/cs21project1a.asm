@@ -1,6 +1,6 @@
 # CS 21 LAB3 -- S2 AY 2022-2023
 # Joshua Felipe -- 05/11/2023
-# cs21project1c.asm -- Tetrisito Machine Project 1
+# cs21project1a.asm -- Tetrisito Machine Project 1
 
 
 ##################### MACROS #############################

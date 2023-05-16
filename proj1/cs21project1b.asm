@@ -1,6 +1,6 @@
 # CS 21 LAB3 -- S2 AY 2022-2023
 # Joshua Felipe -- 05/11/2023
-# cs21project1c.asm -- Tetrisito Machine Project 1
+# cs21project1b.asm -- Tetrisito Machine Project 1
 
 
 ##################### MACROS #############################
@@ -898,9 +898,9 @@ main:
 	beqz	$v0, end_program
 	
 	##### INITIALIZE CHOSEN PIECES ARRAY #####
-	la	$s3, chosen
-	move	$t0, $s3			# make copy of address of s3
-	init_chosen($s2, $t0)
+	#la	$s3, chosen
+	#move	$t0, $s3			# make copy of address of s3
+	#init_chosen($s2, $t0)
 	
 	##### GET PIECCES INPUT #####
 	la	$s4, converted_pieces
@@ -910,9 +910,9 @@ main:
 	
 	##### START OF BACKTRACKING #####
 	# def backtrack(currGrid, chosen, pieces)
-	
+	li	$s3, 0
 	move	$a0, $s0			# grid
-	move	$a1, $s3			# chosen
+	move	$a1, $s3			# i
 	move	$a2, $s4			# pieces
 	
 	jal	backtrack
@@ -922,38 +922,28 @@ backtrack:
 	##### PREAMBLE #####
 	subi	$sp, $sp, 32
 	sw	$s0, 28($sp)			# currGrid
-	sw	$s3, 24($sp)			# chosen
-	sw	$s4, 20($sp)			# pieces	
-	sw	$t1, 16($sp)			# i
-	sw	$t5, 12($sp)			# offset
-	sw	$s5, 8($sp)			# chosen_copy
-	sw	$ra, 4($sp)			# ra
-	sw	$t3, 0($sp)			# max_x_piece
-	
+	sw	$s4, 24($sp)			# pieces	
+	sw	$s3, 20($sp)			# i
+	sw	$t5, 16($sp)			# offset
+	sw	$ra, 12($sp)			# ra
+	sw	$t3, 8($sp)			# max_x_piece
+	sw	$t2, 4($sp)			# success
 	
 	move	$s0, $a0			# address of currGrid -> nextGrid	($s0)
 	move	$s3, $a1			# address of chosen -> chosen_copy	($s5)
 	move	$s4, $a2			# address of pieces -> pieces		($s4)
 	
+	li	$t2, 0				# success
+	
 	not_fit($s0, $s1)			# Checks if the piece fits in the final grid. Used for optimization
-	beq	$v0, 1, return_false		# If 0, return false. Go back to recursive call
+	bnez	$v0, return_false		# If 0, return false. Go back to recursive call
 	
 	is_equal_grids($s0, $s1)		# Checks if the grids are equal.
 	bnez	$v0, end			# If 1, stop recursion.
 	
-else:
-	deepcopy($s3, 2)
-	move	$s5, $v0			# chosen_copy = chosen[:]
-	subi	$s5, $s5, 8			# Subtracts 8 since for some reason it increments the final address by 8.
+	bge 	$s3, $s2, return_false
 	
-	#li	$t1, 0				# initialize i
-	move	$s6, $s3			# created a copy of the address of chosen
-	move	$s7, $s5			# created a copy of the address of chosen_copy
-loop_i:
-	lb	$t2, 0($s6)			# chosen[i]
-	#bnez	$t2, loop_back_to_i		# if not chosen[i]:
-	
-	get_max_x_of_piece($s4, $t1)		# get_max_x_of_piece(pieces[i])
+	get_max_x_of_piece($s4, $s3)		# get_max_x_of_piece(pieces[i])
 	move	$t3, $v0			#  max_x_of_piece
 	
 	#  for offset in range(6 - max_x_of_piece):
@@ -964,57 +954,50 @@ loop_i:
 loop_offset:
 	# nextGrid, success = drop_piece_in_grid(currGrid, pieces[i], offset)
 	
-	subi	$sp, $sp, 4			# Preamble
-	sw	$t1, 0($sp)			# Due to lack of registers need to store t1 to memory and return value after
-	
+	move	$t1, $s3
 	sll	$t1, $t1, 4
 	add	$t1, $t1, $s4			# pieces[i]
 		
 	drop_piece_in_grid($s0, $t1, $t5)	# drop_piece_in_grid(currGrid, pieces[i], offset)
 	# return values: $v0 = nextGrid & $v1 = success
 	
-	lw	$t1, 0($sp)			
-	addi	$sp, $sp, 4			# Postamble
-	
-	beqz	$v1, loop_back_to_offset	# if success:
-	li	$t0, 1
-	sb	$t0, 0($s7)			# chosen_copy[i] = True	
+	move	$t2, $v1
+	beqz	$t2, loop_back_to_offset	# if success:
 	
 	# Moving values for recursive call
+	addi	$t1, $s3, 1
 	move	$a0, $v0			# nextGrid
-	move	$a1, $s5			# chosen_copy
+	move	$a1, $t1			# i+1
 	move	$a2, $s4			# pieces
 	jal	backtrack			# backtrack(nextGrid, chosen_copy, pieces)
 	
-
 	bnez	$v0, end			# if backtrack(nextGrid, chosenCopy, pieces):
-	li	$t0, 0
-	add	$s7, $s5, $t1
-	sb	$t0, 0($s7)			# chosen_copy[i] = False
 	
 loop_back_to_offset:
 	addi	$t5, $t5, 1			# offset++
 	blt	$t5, $t3, loop_offset		# go back to loop_offset
+	bnez	$t2, end
 	
-loop_back_to_i:
-	addi	$t1, $t1, 1			# i++
-	add	$s6, $s3, $t1			# chosen++
-	add	$s7, $s5, $t1			# chosen_copy++
-	blt	$t1, $s2, loop_i		# go back to loop_i
+check_not_success:
+	addi	$t1, $s3, 1
+	move	$a0, $v0			# nextGrid
+	move	$a1, $t1			# i+1
+	move	$a2, $s4			# pieces
+	jal	backtrack			# backtrack(nextGrid, chosen_copy, pieces)
+	j	end
 	
 return_false:
 	li	$v0, 0
-	
+
 end:
 	##### POSTAMBLE #####
 	lw	$s0, 28($sp)			# currGrid
-	lw	$s3, 24($sp)			# chosen
-	lw	$s4, 20($sp)			# pieces	
-	lw	$t1, 16($sp)			# i
-	lw	$t5, 12($sp)			# offset
-	lw	$s5, 8($sp)			# chosen_copy
-	lw	$ra, 4($sp)			# ra
-	lw	$t3, 0($sp)			# max_x_piece
+	lw	$s4, 24($sp)			# pieces	
+	lw	$s3, 20($sp)			# i
+	lw	$t5, 16($sp)			# offset
+	lw	$ra, 12($sp)			# ra
+	lw	$t3, 8($sp)			# max_x_piece
+	lw	$t2, 4($sp)			# success
 	addi	$sp, $sp, 32
 	jr	$ra				# return to last recursive call
 	
