@@ -1,0 +1,7 @@
+Running: xsim.dir/flopr_testbench_behav/xsimk.exe -simmode gui -wdb flopr_testbench_behav.wdb -simrunnum 0 -socket 50971
+Design successfully loaded
+Design Loading Memory Usage: 7828 KB (Peak: 7828 KB)
+Design Loading CPU Usage: 0 ms
+Simulation completed
+Simulation Memory Usage: 8396 KB (Peak: 8396 KB)
+Simulation CPU Usage: 15 ms

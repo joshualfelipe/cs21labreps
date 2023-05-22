@@ -1,0 +1,234 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Mon May 22 15:41:26 2023
+# Process ID: 7404
+# Current directory: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent24320 C:\Users\Joshua Felipe\OneDrive\Desktop\FELIPE\Lab9\project_1\project_1.xpr
+# Log file: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/vivado.log
+# Journal file: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1\vivado.jou
+# Running On: Joshua, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 4, Host memory: 25446 MB
+#-----------------------------------------------------------
+start_gui
+open_project {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.xpr}
+update_compile_order -fileset sources_1
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/slt2_testbench.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/slt2_testbench.sv}}
+update_compile_order -fileset sources_1
+launch_simulation
+source adder_testbench.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sl2_testbench [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sl2_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+close_sim
+launch_simulation
+source sl2_testbench.tcl
+close_sim
+launch_simulation
+source sl2_testbench.tcl
+close_sim
+launch_simulation
+source sl2_testbench.tcl
+close_sim
+launch_simulation
+source sl2_testbench.tcl
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top signext [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+close_sim
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 8
+wait_on_run synth_1
+open_run synth_1 -name synth_1
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext_testbench.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext_testbench.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top signext_testbench [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top signext_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+source signext_testbench.tcl
+close_sim
+launch_simulation
+source signext_testbench.tcl
+close_sim
+launch_simulation
+source signext_testbench.tcl
+close_sim
+launch_simulation
+source signext_testbench.tcl
+close_sim
+launch_simulation
+source signext_testbench.tcl
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top flopr [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+close_sim
+reset_run synth_1
+launch_runs synth_1 -jobs 8
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr_testbench.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr_testbench.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top flopr_testbench [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top flopr_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+source flopr_testbench.tcl
+close_sim
+launch_simulation
+source flopr_testbench.tcl
+close_sim
+launch_simulation
+source flopr_testbench.tcl
+close_sim
+launch_simulation
+source flopr_testbench.tcl
+close_sim
+launch_simulation
+source flopr_testbench.tcl
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top mux2 [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 8
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+close [ open {C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2_testbench.sv} w ]
+add_files {{C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2_testbench.sv}}
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top mux2_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top mux2_testbench [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+launch_simulation
+close_sim
+launch_simulation
+source mux2_testbench.tcl
+close_sim
+launch_simulation
+source mux2_testbench.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top regfile_testbench_2 [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+close_sim
+launch_simulation
+source mux2_testbench.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top regfile_testbench_2 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+close_sim
+launch_simulation
+source regfile_testbench_2.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top adder_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+close_sim
+launch_simulation
+source adder_testbench.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sl2_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+close_sim
+reset_run synth_1
+launch_simulation
+source sl2_testbench.tcl
+close_sim
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top signext_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+source signext_testbench.tcl
+close_sim
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top flopr_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+source flopr_testbench.tcl
+close_sim
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top mux2_testbench [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+source mux2_testbench.tcl
+close_sim

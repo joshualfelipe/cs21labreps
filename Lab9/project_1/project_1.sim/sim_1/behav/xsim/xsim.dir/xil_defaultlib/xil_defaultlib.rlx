@@ -1,0 +1,18 @@
+0.7
+2020.2
+Oct 14 2022
+05:20:55
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.sim/sim_1/behav/xsim/glbl.v,1665704903,verilog,,,,glbl,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/adder.sv,1684739908,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/adder_testbench.sv,,adder,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/adder_testbench.sv,1684744997,systemVerilog,,,,adder_testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr.sv,1684744326,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr_testbench.sv,,flopr,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr_testbench.sv,1684744151,systemVerilog,,,,flopr_testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2.sv,1684744333,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2_testbench.sv,,mux2,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2_testbench.sv,1684745152,systemVerilog,,,,mux2_testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile.sv,1684736070,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile_testbench_2.sv,,regfile,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile_testbench.sv,1684736285,systemVerilog,,,,regfile_testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile_testbench_2.sv,1684745011,systemVerilog,,,,regfile_testbench_2,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext.sv,1684742229,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext_testbench.sv,,signext,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext_testbench.sv,1684745014,systemVerilog,,,,signext_testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/sl2.sv,1684741161,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/slt2_testbench.sv,,sl2,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/slt2_testbench.sv,1684745018,systemVerilog,,,,sl2_testbench,,uvm,,,,,,
