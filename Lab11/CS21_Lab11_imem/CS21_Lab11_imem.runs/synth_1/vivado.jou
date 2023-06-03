@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Sat Jun  3 21:59:34 2023
+# Process ID: 18900
+# Current directory: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/CS21_Lab11_imem/CS21_Lab11_imem.runs/synth_1
+# Command line: vivado.exe -log datapath.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source datapath.tcl
+# Log file: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/CS21_Lab11_imem/CS21_Lab11_imem.runs/synth_1/datapath.vds
+# Journal file: C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/CS21_Lab11_imem/CS21_Lab11_imem.runs/synth_1\vivado.jou
+# Running On: Joshua, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 4, Host memory: 25446 MB
+#-----------------------------------------------------------
+source datapath.tcl -notrace
