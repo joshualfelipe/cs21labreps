@@ -1,0 +1,21 @@
+0.7
+2020.2
+Oct 14 2022
+05:20:55
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab10/CS21_Lab10_voltin/CS21_Lab10_voltin.srcs/sources_1/new/alu.sv,1685800618,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/aludec.sv,,alu,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/aludec.sv,1685754821,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/controller.sv,,aludec,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/datapath.sv,1685754821,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/dmem.sv,,datapath,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/imem.sv,1685754821,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/maindec.sv,,imem,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/controller.sv,1685802202,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/datapath.sv,,controller,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/dmem.sv,1685802202,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr.sv,,dmem,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/maindec.sv,1685802202,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/mips.sv,,maindec,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/mips.sv,1685802202,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2.sv,,mips,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/testbench.sv,1685802202,systemVerilog,,,,testbench,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/top.sv,1685802202,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/testbench.sv,,top,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS21_Lab12_SCP/CS21_Lab12_SCP.sim/sim_1/behav/xsim/glbl.v,1665704903,verilog,,,,glbl,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/adder.sv,1684739908,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab10/CS21_Lab10_voltin/CS21_Lab10_voltin.srcs/sources_1/new/alu.sv,,adder,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/flopr.sv,1684744326,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab11/src/imem.sv,,flopr,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/mux2.sv,1684744333,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile.sv,,mux2,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/regfile.sv,1684736070,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext.sv,,regfile,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/signext.sv,1684742229,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/sl2.sv,,signext,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab9/project_1/project_1.srcs/sources_1/new/sl2.sv,1684741161,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/Lab12/CS 21 Lab 12 SystemVerilog Files/top.sv,,sl2,,uvm,,,,,,
