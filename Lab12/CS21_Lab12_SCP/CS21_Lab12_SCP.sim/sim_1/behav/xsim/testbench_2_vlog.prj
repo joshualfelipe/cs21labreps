@@ -15,7 +15,7 @@ sv xil_defaultlib  \
 "../../../../../../Lab9/project_1/project_1.srcs/sources_1/new/signext.sv" \
 "../../../../../../Lab9/project_1/project_1.srcs/sources_1/new/sl2.sv" \
 "../../../../../CS 21 Lab 12 SystemVerilog Files/top.sv" \
-"../../../../../CS 21 Lab 12 SystemVerilog Files/testbench.sv" \
+"../../../../CS21_Lab12_SCP.srcs/sources_1/new/testbench_2.sv" \
 
 # compile glbl module
 verilog xil_defaultlib "glbl.v"
