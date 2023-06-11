@@ -17,7 +17,7 @@ imem instantiated_imem(a, rd);
     // In order to output properly in vivado, I used a for loop to avoid
     // repeteated lines of code. This for loop would iterate through all
     // possible 6 bit combinations or 0 - 63 in decimal
-    for(a = 0; a < 63; a = a + 1)begin
+    for(a = 0; a <= 63; a = a + 1)begin
         #2;     // wait for 1 clock cycle before checking next value
     end
   end
