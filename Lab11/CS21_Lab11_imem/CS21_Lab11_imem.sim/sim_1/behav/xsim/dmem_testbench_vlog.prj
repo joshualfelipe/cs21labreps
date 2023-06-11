@@ -1,5 +1,6 @@
 # compile verilog/system verilog design source files
 sv xil_defaultlib  \
+"../../../../../src/imem.sv" \
 "../../../../../files/imem_testbench.sv" \
 
 # compile glbl module
