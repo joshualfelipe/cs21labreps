@@ -22,7 +22,7 @@ module maindec(input  logic [5:0] op,
       6'b001110: controls <= 9'b101000011; // XORI
       6'b001111: controls <= 9'b101000011; // LUI
       6'b000110: controls <= 9'b110000010; // SRLV
-      6'b011101: controls <= 9'b000100001; // bgtz
+      6'b011101: controls <= 9'b000100011; // bgtz
       6'b010001: controls <= 9'b101000011; // LI
       default:   controls <= 9'bxxxxxxxxx; // illegal op
     endcase

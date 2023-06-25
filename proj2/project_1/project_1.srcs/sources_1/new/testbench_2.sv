@@ -21,7 +21,6 @@ module testbench_2();
     begin
       clk <= 1; # 5; clk <= 0; # 5;
     end
-
-  // check results
- 
+    
+  // check 
 endmodule

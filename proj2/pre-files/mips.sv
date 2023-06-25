@@ -8,7 +8,7 @@ module mips(input  logic        clk, reset,
 
   logic       memtoreg, alusrc, regdst, 
               regwrite, jump, pcsrc, zero;
-  logic [3:0] alucontrol;
+  logic [4:0] alucontrol;
 
   controller c(instr[31:26], instr[5:0], zero,
                memtoreg, memwrite, pcsrc,
