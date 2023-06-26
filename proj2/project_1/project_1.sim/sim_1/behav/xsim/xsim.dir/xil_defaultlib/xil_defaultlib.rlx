@@ -3,7 +3,7 @@
 Oct 14 2022
 05:20:55
 C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/adder.sv,1687425634,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/alu.sv,,adder,,uvm,,,,,,
-C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/alu.sv,1687666983,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/aludec.sv,,alu,,uvm,,,,,,
+C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/alu.sv,1687739507,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/aludec.sv,,alu,,uvm,,,,,,
 C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/aludec.sv,1687667071,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/controller.sv,,aludec,,uvm,,,,,,
 C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/controller.sv,1687517360,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/datapath.sv,,controller,,uvm,,,,,,
 C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/datapath.sv,1687517386,systemVerilog,,C:/Users/Joshua Felipe/OneDrive/Desktop/FELIPE/proj2/pre-files/dmem.sv,,datapath,,uvm,,,,,,

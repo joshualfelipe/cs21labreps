@@ -4,9 +4,10 @@ module alu(input  logic [31:0] a, b,
            output logic [31:0] result,
            output logic        zero);
   
-  logic [31:0] condinvb, sum, xori;
+  logic [31:0] condinvb, sum, xori, srlv;
   
   assign xori = {16'b0, b[15:0]};       // Zero extend the immediate
+  assign srlv = {16'b0, a[4:0]};        // get only the lower 5 bits
   assign condinvb = alucontrol[4] ? ~b : b;
   assign sum = a + condinvb + alucontrol[4];
   
@@ -18,8 +19,8 @@ module alu(input  logic [31:0] a, b,
       4'b0011: result = sum[31];
       4'b0100: result = a^xori;         // XORI
       4'b0101: result = {b, 16'b0};     // LUI
-      4'b0110: result = b >> a;         // SRLV
-      4'b0111: result = b;              // LI
+      4'b0110: result = b >> srlv;         // SRLV
+      4'b0111: result = xori;              // LI
       4'b1000: result = (a[31] === 0 & a > 0) ? 0 : 1; // BGTZ - check if not negative and greater than 0
     endcase
 
